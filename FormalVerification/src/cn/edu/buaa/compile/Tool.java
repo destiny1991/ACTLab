@@ -26,7 +26,7 @@ public class Tool {
 	}
 	
 	/**
-	 * 输出codeSet的内容
+	 * 输出codeSet的中指令的全部内容
 	 * @param codeSet
 	 */
 	public static void printCodeSet(List<Instruction> codeSet) {
@@ -61,6 +61,10 @@ public class Tool {
 		}
 	}
 	
+	/**
+	 * 输出代码的指称语义
+	 * @param codeSet
+	 */
 	public static void printCodeSemantic(List<Instruction> codeSet) {
 		for(Instruction ins : codeSet) {
 			List<Item> semanSet = ins.getSeman().getSemanSet();

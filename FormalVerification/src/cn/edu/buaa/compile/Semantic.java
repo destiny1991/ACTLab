@@ -20,6 +20,3 @@ public class Semantic {
 		this.semanSet = semanSet;
 	}
 }
-
-
-
