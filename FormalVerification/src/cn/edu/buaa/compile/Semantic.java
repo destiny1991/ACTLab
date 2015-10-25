@@ -11,6 +11,10 @@ public class Semantic {
 	
 	public Semantic() {
 	}
+	
+	public Semantic(List<Item> semanSet) {
+		this.semanSet = semanSet;
+	}
 
 	public List<Item> getSemanSet() {
 		return semanSet;

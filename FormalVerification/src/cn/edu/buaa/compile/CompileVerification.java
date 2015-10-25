@@ -11,11 +11,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 形式验证主体函数
+ * 形式验证程序
  * @author destiny
  */
 public class CompileVerification {
 	private List<Instruction> codeSet;
+	private List<Semantic> result;
 	
 	public CompileVerification() {
 	}
@@ -50,6 +51,56 @@ public class CompileVerification {
 		return instructionSet;
 	}
 	
+	/**
+	 * 
+	 * @param item1		未加入semanSet
+	 * @param item2		已加入semanSet
+	 * @return
+	 */
+	public Item solveTwoItem(Item item1, Item item2) {
+		if(null == item2.getPremise() && null == item2.getRight()) return item1;
+		else if(null == item2.getPremise()) {
+			
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param smt1	code当前遍历到的语义
+	 * @param smt2	对semanSet已存在的语义，只能增加和修改
+	 * @return
+	 */
+	public Semantic solveTwoSemantic(Semantic smt1, Semantic smt2) {
+		List<Item> tmp = new ArrayList<Item>();
+		
+		for(Item item2 : smt2.getSemanSet()) {
+			for(Item item1 : smt1.getSemanSet()) {
+				Item e = solveTwoItem(item1, item2);
+				if(null != tmp) tmp.add(e);
+			}
+		}
+		
+		if(0 == tmp.size()) return null;
+		else return new Semantic(tmp);
+	}
+	
+	public List<Semantic> verificationProcess(List<Instruction> codeSet) {
+		List<Semantic> semanSet = new ArrayList<Semantic>();
+		
+		for(int i=0; i<codeSet.size(); i++) {
+			Semantic smt1 = codeSet.get(i).getSeman();	//code当前遍历到的语义
+			for(int j=0; j<semanSet.size(); j++) {
+				Semantic smt2 = semanSet.get(j);		//已存在semanSet中的语义
+				Semantic e = solveTwoSemantic(smt1, smt2);
+				if(null != e) semanSet.add(e);			//对semanSet已存在的语义，只能增加和修改
+			}
+		}
+				
+		return semanSet;
+	}
+	
 	public void runApp(String inputFile, String regex) {
 		File file = new File(inputFile);
 		
@@ -69,14 +120,15 @@ public class CompileVerification {
 			 * 把输入的汇编代码翻译成对应的指称语义形式
 			 */
 			codeSet = createInstructionSet(reader, regex);
-			//Tool.printCodeSet(codeSet);
+			if(null == codeSet || 0 == codeSet.size()) return;
+//			Tool.printCodeSet(codeSet);
 			Tool.printCodeSemantic(codeSet);
 			
 			/**
 			 * 基于指称语义进行推导
 			 */
-			
-			
+//			result = verificationProcess(codeSet);
+//			Tool.printSemanticList(result);
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

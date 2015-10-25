@@ -26,6 +26,44 @@ public class Tool {
 	}
 	
 	/**
+	 * 输出Item List
+	 * @param result
+	 */
+	public static void printItemList(List<Item> result) {
+		for(Item item : result) {
+			if(null == item.getPremise() && null == item.getRight()) {
+				System.out.println(item.getLeft());
+			} else if(null == item.getPremise()) {
+				System.out.println(item.getLeft() + " = " + item.getRight());
+			} else {
+				System.out.println(item.getPremise() + " -> " 
+						+ item.getLeft() + " = " + item.getRight());
+			}
+		}
+	}
+	
+	/**
+	 * 输出所有的语义
+	 * @param seman
+	 */
+	public static void printSemanticList(List<Semantic> seman) {
+		for(Semantic sm : seman) {
+			List<Item> semanSet = sm.getSemanSet();
+			for(Item item : semanSet) {
+				if(null == item.getPremise() && null == item.getRight()) {
+					System.out.println(item.getLeft());
+				} else if(null == item.getPremise()) {
+					System.out.println(item.getLeft() + " = " + item.getRight());
+				} else {
+					System.out.println(item.getPremise() + " -> " 
+							+ item.getLeft() + " = " + item.getRight());
+				}
+			}
+			System.out.println();
+		}
+	}
+	
+	/**
 	 * 输出codeSet的中指令的全部内容
 	 * @param codeSet
 	 */
