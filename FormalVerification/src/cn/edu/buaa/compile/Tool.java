@@ -1,9 +1,8 @@
 package cn.edu.buaa.compile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class Tool {
 	/**
@@ -15,104 +14,67 @@ public class Tool {
 		List<String> tmp = new ArrayList<String>();
 		if(null != lines && 0 != lines.length) {
 			for(String s : lines) {
-				if(" " == s || "," == s || "" == s ||
+				if(0 == s.length() || "\t" == s || " " == s || "," == s || "" == s ||
 						"(" == s || ")" == s) continue;
 				tmp.add(s);
 			}
 		}
-		return (String[]) tmp.toArray();
-	}
-	
-	public static Map<String, String> generateParas(String[] lines) {
-		Map<String, String> paras = new HashMap<String, String>();
-		switch (lines[0]) {
-		case "cmpi":
-			paras.put("crfD", lines[1]);
-			paras.put("rA", lines[3]);
-			paras.put("SIMM", lines[4]);
-			break;
-		case "bc":
-			paras.put("BO", lines[1]);
-			paras.put("BI", lines[2]);
-			paras.put("BD", lines[3]);
-			paras.put("AA", "0");
-			paras.put("LK", "0");
-			break;
-		case "b":
-			paras.put("LI", lines[1]);
-			paras.put("AA", "0");
-			paras.put("LK", "0");
-			break;
-		default:
-			break;
-		}
-		return paras;
-	}
-	
-	public static Semantic generateSemantic(String name, Map<String, String> paras) {
-		Semantic seman = new Semantic();
-		List<Item> semanSet = new ArrayList<Item>();
-		seman.setSemanSet(semanSet);
-		String premise;
-		String left;
-		String right;
-		Item item;
 		
-		switch (name) {
-		case "cmpi":
-			premise = "GPR[" + paras.get("rA") + "] < {16{" 
-							+ paras.get("SIMM") + "[16]}, " + paras.get("SIMM") + "}";
-			left = "CR[" + paras.get("crfD") + "]";
-			right = "{3'b100, XER.SO}";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			
-			premise = "GPR[" + paras.get("rA") + "] > {16{" 
-					+ paras.get("SIMM") + "[16]}, " + paras.get("SIMM") + "}";
-			left = "CR[" + paras.get("crfD") + "]";
-			right = "{3'b010, XER.SO}";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			
-			premise = "GPR[" + paras.get("rA") + "] = {16{" 
-					+ paras.get("SIMM") + "[16]}, " + paras.get("SIMM") + "}";
-			left = "CR[" + paras.get("crfD") + "]";
-			right = "{3'b001, XER.SO}";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			
-			break;
-		case "bc":
-			premise = "CR[" + paras.get("BI") + "] = {3'b001, XER.SO}";
-			left = "PC";
-			right = "(PC + {16{" + paras.get("BD") + "[0]}, " + paras.get("BD") + ", 2'b0})";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			
-			premise = "CR[" + paras.get("BI") + "] = {3'b100, XER.SO}";
-			left = "PC";
-			right = "PC + 4";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			
-			premise = "CR[" + paras.get("BI") + "] = {3'b010, XER.SO}";
-			left = "PC";
-			right = "PC + 4";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			break;
-		case "b":
-			premise = null;
-			left = "PC";
-			right = "PC + {6{" + paras.get("LI") + "[0]}, " + paras.get("LI") + ", 2'b0}";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			break;
-		default:
-			break;
-		}
-		return seman;
+		String[] lists = new String[tmp.size()];
+		tmp.toArray(lists);
+		return lists;
 	}
 	
+	/**
+	 * 输出codeSet的内容
+	 * @param codeSet
+	 */
+	public static void printCodeSet(List<Instruction> codeSet) {
+		for(Instruction ins : codeSet) {
+			System.out.println("name: " + ins.getName());
+			
+			System.out.print("paras: ");
+			if(null != ins.getParas()) {
+				Set<String> keys = ins.getParas().keySet();
+				for(String key : keys) {
+					String value = ins.getParas().get(key);
+					System.out.print(key + "--" + value + "\t");
+				}
+			} else {
+				System.out.print("null");
+			}
+			System.out.println();
+			
+			System.out.println("Semantic: ");
+			List<Item> semanSet = ins.getSeman().getSemanSet();
+			for(Item item : semanSet) {
+				if(null == item.getPremise() && null == item.getRight()) {
+					System.out.println(item.getLeft());
+				} else if(null == item.getPremise()) {
+					System.out.println(item.getLeft() + " = " + item.getRight());
+				} else {
+					System.out.println(item.getPremise() + " -> " 
+							+ item.getLeft() + " = " + item.getRight());
+				}
+			}
+			System.out.println();
+		}
+	}
 	
+	public static void printCodeSemantic(List<Instruction> codeSet) {
+		for(Instruction ins : codeSet) {
+			List<Item> semanSet = ins.getSeman().getSemanSet();
+			for(Item item : semanSet) {
+				if(null == item.getPremise() && null == item.getRight()) {
+					System.out.println(item.getLeft());
+				} else if(null == item.getPremise()) {
+					System.out.println(item.getLeft() + " = " + item.getRight());
+				} else {
+					System.out.println(item.getPremise() + " -> " 
+							+ item.getLeft() + " = " + item.getRight());
+				}
+			}
+			System.out.println();
+		}
+	}
 }

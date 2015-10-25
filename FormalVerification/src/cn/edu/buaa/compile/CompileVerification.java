@@ -18,17 +18,17 @@ public class CompileVerification {
 	private List<Instruction> codeSet;
 	
 	public CompileVerification() {
-		codeSet = new ArrayList<Instruction>();
 	}
 	
-	public  Instruction createInstruction(BufferedReader reader, String regex) throws IOException {
+	public  List<Instruction> createInstructionSet(BufferedReader reader, String regex) throws IOException {
+		List<Instruction> instructionSet = new ArrayList<Instruction>();
 		String str;
 		Instruction inst = null;
 		while(null != (str = reader.readLine())) {
 			str = str.trim();
 			if(0 == str.length()) continue;
 			
-			String[] lines = str.split(regex);
+			String[] lines = str.split(regex);	//separator不作为任何数组元素的部分返回
 			if(1 == lines.length) {		//特殊处理单项
 				inst = new Instruction(lines[0]);
 				List<Item> semanSet = new ArrayList<Item>();
@@ -40,13 +40,14 @@ public class CompileVerification {
 			} else {
 				lines = Tool.filterOtherSignal(lines); 
 				inst = new Instruction(lines[0]);
-				Map<String, String> paras = Tool.generateParas(lines);
-				Semantic seman = Tool.generateSemantic(lines[0], paras);
+				Map<String, String> paras = Helper.generateParas(lines);
+				Semantic seman = Helper.generateSemantic(lines[0], paras);
 				inst.setParas(paras);
 				inst.setSeman(seman);
 			}
+			instructionSet.add(inst);
 		}
-		return inst;
+		return instructionSet;
 	}
 	
 	public void runApp(String inputFile, String regex) {
@@ -67,8 +68,9 @@ public class CompileVerification {
 			/**
 			 * 把输入的汇编代码翻译成对应的指称语义形式
 			 */
-			Instruction inst = createInstruction(reader, regex);
-			codeSet.add(inst);
+			codeSet = createInstructionSet(reader, regex);
+			//Tool.printCodeSet(codeSet);
+			Tool.printCodeSemantic(codeSet);
 			
 			/**
 			 * 基于指称语义进行推导
@@ -94,7 +96,7 @@ public class CompileVerification {
 	public static void main(String[] args) {
 		CompileVerification cv = new CompileVerification();
 		String inputPath = "src/cn/edu/buaa/resources/assembly.txt";
-		String regex = " |,|\\(|\\)";
+		String regex = "\t| |,|\\(|\\)";
 		cv.runApp(inputPath, regex);
 	}
 }
