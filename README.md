@@ -1,6 +1,8 @@
 # ACTLab
-This is my ACT Laboratory project.\n 
-FormalVerification is the main project.\n
+This is my ACT Laboratory project.
+
+FormalVerification is the main project.
+
 power_pc e500 is just a test one.
 
 destiny
