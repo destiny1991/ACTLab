@@ -1,0 +1,356 @@
+and rA, rS, rB
+and. rA, rS, rB
+
+andc rA, rS, rB
+andc. rA, rS, rB
+
+andi. rA, rS, UIMM
+
+andis. rA, rS, UIMM
+
+nand rA, rS, rB
+nand. rA, rS, rB
+
+nor rA, rS, rB
+nor. rA, rS, rB
+
+or rA, rS, rB
+or. rA, rS, rB
+
+orc rA, rS, rB
+orc. rA, rS, rB
+
+ori rA, rS, UIMM
+
+oris rA, rS, UIMM
+
+xor rA, rS, rB
+xor. rA, rS, rB 
+
+xori rA, rS, UIMM
+
+xoris rA, rS, UIMM
+
+eqv rA, rS, rB
+eqv. rA, rS, rB 
+
+
+add rD, rA, rB
+add. rD, rA, rB
+addo rD, rA, rB
+addo. rD, rA, rB
+
+addc rD, rA, rB
+addc. rD, rA, rB
+addco rD, rA, rB
+addco. rD, rA, rB
+
+adde rD, rA, rB
+adde. rD, rA, rB
+addeo rD, rA, rB
+addeo. rD, rA, rB
+
+addi rD, rA, SIMM
+
+addic rD,rA,SIMM
+addic. rD,rA,SIMM
+
+addis rD, rA, SIMM
+
+addme rD, rA
+addme. rD, rA
+addmeo rD, rA
+addmeo. rD, rA
+
+addze rD, rA
+addze. rD, rA
+addzeo rD, rA
+addzeo. rD, rA
+
+neg rD, rA
+neg. rD, rA
+nego rD, rA
+nego. rD, rA
+
+subf rD, rA, rB
+subf. rD, rA, rB
+subfo rD, rA, rB
+subfo. rD, rA, rB
+
+subfc rD, rA, rB
+subfc. rD, rA, rB
+subfco rD, rA, rB
+subfco. rD, rA, rB
+
+subfe rD, rA, rB
+subfe. rD, rA, rB
+subfeo rD, rA, rB
+subfeo. rD, rA, rB
+
+subfic rD, rA, SIMM
+
+subfme rD, rA
+subfme. rD, rA
+subfmeo rD, rA
+subfmeo. rD, rA
+
+subfze rD, rA
+subfze. rD, rA
+subfzeo rD, rA
+subfzeo. rD, rA
+
+
+divw rD, rA, rB
+divw. rD, rA, rB
+divwo rD, rA, rB
+divwo. rD, rA, rB
+
+divwu rD, rA, rB
+divwu. rD, rA, rB
+divwuo rD, rA, rB
+divwuo. rD, rA, rB
+
+mulhw rD, rA, rB
+mulhw. rD, rA, rB
+
+mulhwu rD, rA, rB
+mulhwu. rD, rA, rB
+
+mulli rD, rA, SIMM
+
+mullw rD, rA, rB
+mullw. rD, rA, rB
+mullwo rD, rA, rB
+mullwo. rD, rA, rB
+
+
+b LI
+ba LI
+bl LI
+bla LI
+
+bc BO, BI, BD
+bca BO, BI, BD
+bcl BO, BI, BD
+bcla BO, BI, BD
+
+bcctr BO, BI
+bcctrl BO, BI
+
+bclr BO, BI
+bclrl BO, BI
+
+
+cmp crfD, L, rA, rB
+cmpi crfD, L, rA, SIMM
+cmpl crfD, L, rA, rB
+cmpli crfD, L, rA, UIMM
+
+
+slw rA, rS, rB
+slw. rA, rS, rB
+
+sraw rA, rS, rB
+sraw. rA, rS, rB
+
+srawi rA, rS, SH
+srawi. rA, rS, SH
+
+srw rA, rS, rB
+srw. rA, rS, rB
+
+rlwimi rA, rS, SH, MB, ME
+rlwimi. rA, rS, SH, MB, ME
+
+rlwinm rA, rS, SH, MB, ME
+rlwinm. rA, rS, SH, MB, ME
+
+rlwnm rA,rS,rB,MB,ME
+rlwnm. rA,rS,rB,MB,ME
+
+
+lbz rD, d(rA)
+lbzu rD, d(rA)
+
+lbzux rD, rA, rB
+lbzx rD, rA, rB
+
+lha rD, d(rA)
+lhau rD, d(rA)
+
+lhaux rD, rA, rB
+lhax rD, rA, rB
+lhbrx rD, rA, rB
+
+lhz rD, d(rA)
+lhzu rD, d(rA)
+
+lhzux rD, rA, rB
+lhzx rD, rA, rB
+lwbrx rD, rA, rB
+
+lwz rD, d(rA)
+lwzu rD, d(rA)
+
+lwzux rD, rA, rB
+lwzx rD, rA, rB
+
+dsn rA,rB
+
+lbdx rD,rA,rB
+lhdx rD,rA,rB
+lwdx rD,rA,rB
+lwarx rD,rA,rB
+
+lmw rD,D(rA)
+
+cntlzw rA,rS
+cntlzw. rA,rS
+
+
+stb rS, d(rA)
+stbu rS, d(rA)
+
+stbux rS, rA, rB
+stbx rS, rA, rB
+
+sth rS, d(rA)
+
+sthbrx rS, rA, rB
+
+sthu rS, d(rA)
+
+sthux rS, rA, rB
+sthx rS, rA, rB
+
+stw rS, d(rA)
+
+stwbrx rS, rA, rB
+
+stwu rS, d(rA)
+
+stwux rS, rA, rB
+stwx rS, rA, rB
+stbdx rS,rA,rB
+
+stfddx frS,rA,rB
+
+sthdx rS,rA,rB
+stwdx rS,rA,rB
+
+stmw rS,D(rA)
+
+stwcx. rS,rA,rB
+
+
+tw TO,rA,rB
+twi TO,rA,SIMM
+
+
+crand crbD, crbA, crbB
+crandc crbD, crbA, crbB
+creqv crbD, crbA, crbB
+crnand crbD, crbA, crbB
+crnor crbD, crbA, crbB
+cror crbD, crbA, crbB
+crxor crbD, crbA, crbB
+
+
+mcrf crfD, crfS
+mcrxr crfD
+
+mfcr rD
+mfmsr rD
+
+mfspr rD, SPRN
+mftb rD, TBRN
+mtcrf CRM, rS
+mtspr SPRN, rS
+mtmsr rS
+mfocrf rD,FXM
+isel rD,rA,rB,crb
+wrtee rS
+wrteei E
+
+msgclr rB
+msgsnd rB
+
+ehpriv OC
+mbar MO
+
+
+sc
+sync L, E
+isync
+wait WC,WH
+rfdi
+rfgi
+rfi
+rfmci
+
+
+dcba rA, rB
+dcbal rA,rB
+dcbf rA, rB
+dcbi rA, rB
+
+dcblc CT,rA,rB
+
+dcbst rA, rB
+
+dcbt CT,rA, rB
+dcbtls CT,rA,rB
+dcbtstls CT,rA,rB
+
+dcbz rA, rB
+dcbzep rA,rB
+dcbzl rA,rB
+dcbzlep rA,rB
+icbi rA, rB
+
+icbt CT,rA, rB
+icblc CT,rA,rB
+icbtls CT,rA,rB
+
+
+dcbfep rA,rB
+dcbstep rA,rB
+
+dcbtep TH,rA,rB
+dcbtstep TH,rA,rB
+
+dcbzep rA,rB
+dcbzlep rA,rB
+icbiep rA,rB
+
+lbepx rD,rA,rB
+lhepx rD,rA,rB
+lwepx rD,rA,rB
+
+stbepx rS,rA,rB
+
+stfdepx frS,rA,rB
+
+sthepx rS,rA,rB
+stwepx rS,rA,rB
+
+tlbilx T,rA,rB
+
+tlbivax rA,rB
+
+tlbsync
+
+tlbsx rA,rB
+
+tlbre
+
+tlbwe
+
+
+dnh DUI,DCTL
+
+
+
+
+
+
