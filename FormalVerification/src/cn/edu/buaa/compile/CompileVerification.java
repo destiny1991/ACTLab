@@ -55,6 +55,9 @@ public class CompileVerification {
 		BufferedReader reader = null;
 		
 		try {
+			/**
+			 * 获得输入汇编代码文件
+			 */
 			reader = new BufferedReader(
 						new InputStreamReader(
 								new FileInputStream(file)
