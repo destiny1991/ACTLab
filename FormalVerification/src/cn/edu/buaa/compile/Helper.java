@@ -71,23 +71,45 @@ public class Helper {
 			
 			break;
 		case "bc":
-			premise = "CR[" + paras.get("BI") + "] = {3'b001, XER.SO}";
-			left = "PC";
-			right = "(PC + {16{" + paras.get("BD") + "[0]}, " + paras.get("BD") + ", 2'b0})";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			
-			premise = "CR[" + paras.get("BI") + "] = {3'b100, XER.SO}";
-			left = "PC";
-			right = "PC + 4";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			
-			premise = "CR[" + paras.get("BI") + "] = {3'b010, XER.SO}";
-			left = "PC";
-			right = "PC + 4";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
+			int bo =  Integer.parseInt(paras.get("BO"));
+			if((bo & 1<<2) > 0 && 0 == (bo & 1<<3)) {
+				premise = "CR[" + paras.get("BI") + "] = {3'b100, XER.SO}";
+				left = "PC";
+				right = "PC + 4";
+				item = new Item(premise, left, right);
+				semanSet.add(item);
+				
+				premise = "CR[" + paras.get("BI") + "] = {3'b010, XER.SO}";
+				left = "PC";
+				right = "PC + 4";
+				item = new Item(premise, left, right);
+				semanSet.add(item);
+				
+				premise = "CR[" + paras.get("BI") + "] = {3'b001, XER.SO}";
+				left = "PC";
+				right = "(PC + {16{" + paras.get("BD") + "[0]}, " + paras.get("BD") + ", 2'b0})";
+				item = new Item(premise, left, right);
+				semanSet.add(item);
+			} else if((bo & 1<<2) > 0 && (bo & 1<<3) > 0) {
+				premise = "CR[" + paras.get("BI") + "] = {3'b100, XER.SO}";
+				left = "PC";
+				right = "PC + 4";
+				item = new Item(premise, left, right);
+				semanSet.add(item);
+				
+				premise = "CR[" + paras.get("BI") + "] = {3'b010, XER.SO}";
+				left = "PC";
+				right = "(PC + {16{" + paras.get("BD") + "[0]}, " + paras.get("BD") + ", 2'b0})";
+				item = new Item(premise, left, right);
+				semanSet.add(item);
+				
+				premise = "CR[" + paras.get("BI") + "] = {3'b001, XER.SO}";
+				left = "PC";
+				right = "PC + 4";
+				item = new Item(premise, left, right);
+				semanSet.add(item);
+			}
+
 			break;
 		case "b":
 			premise = null;

@@ -188,10 +188,10 @@ public class CompileVerification {
 			 * 基于指称语义进行推导
 			 */
 			semanSrc = Tool.cloneSemanFromCodeSet(codeSet);
-//			Tool.printSemanticList(semanSrc);
+			Tool.printSemanticList(semanSrc);
 			result = verificationProcess(semanSrc);
 			long end =  System.currentTimeMillis();
-			System.out.println("数值代入和推导耗时：" + (end - start) + " ms");
+//			System.out.println("数值代入和推导耗时：" + (end - start) + " ms");
 			
 			Tool.saveResult(inputFile, result);
 			System.out.println("\n\n**************************************************");
@@ -214,7 +214,7 @@ public class CompileVerification {
 		
 	public static void main(String[] args) {
 		CompileVerification cv = new CompileVerification();
-		String inputPath = "src/cn/edu/buaa/resources/if.txt";
+		String inputPath = "src/cn/edu/buaa/resources/for.txt";
 		String regex = "\t| |,|\\(|\\)";
 		cv.runApp(inputPath, regex);
 	}
