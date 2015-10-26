@@ -26,6 +26,32 @@ public class Tool {
 	}
 	
 	/**
+	 * 把codeSet中的语义放到List中, 使用clone函数新建和原对象一样的对象
+	 * @param codeSet
+	 * @return
+	 */
+	public static List<Semantic>  cloneSemanFromCodeSet(List<Instruction> codeSet) {
+		List<Semantic> res = new ArrayList<Semantic>();
+		for(Instruction inst : codeSet) {
+			List<Item> ts = inst.getSeman().getSemanSet();
+			List<Item> td = new ArrayList<Item>();
+			
+			for(Item i : ts) {
+				try {
+					Item t = (Item)i.clone();
+					td.add(t);
+				} catch (CloneNotSupportedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			Semantic s = new Semantic(td);
+			res.add(s);
+		}
+		return res;
+	}
+	
+	/**
 	 * 输出Item List
 	 * @param result
 	 */

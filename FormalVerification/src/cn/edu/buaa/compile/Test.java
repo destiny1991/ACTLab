@@ -47,11 +47,65 @@ public class Test {
 		return data;
 	}
 	
+	public static List<Semantic> test3() {
+		List<Semantic> data = new ArrayList<Semantic>();
+		Item item;
+		List<Item> semanSet;
+		Semantic seman;
+		
+		semanSet = new ArrayList<Item>();
+		item = new Item("GPR[0] < {16{0[16]}, 0}", "CR[7]", "{3'b100, XER.SO}");	
+		semanSet.add(item);
+		item = new Item("GPR[0] = {16{0[16]}, 0}", "CR[7]", "{3'b001, XER.SO}");
+		semanSet.add(item);
+		item = new Item("GPR[0] > {16{0[16]}, 0}", "CR[7]", "{3'b010, XER.SO}");
+		semanSet.add(item);
+		seman = new Semantic(semanSet);
+		data.add(seman);
+		
+		semanSet = new ArrayList<Item>();
+		item = new Item("CR[7] = {3'b001, XER.SO}", "PC", "(PC + {16{Address_1[0]}, Address_1, 2'b0})");	
+		semanSet.add(item);
+		item = new Item("CR[7] = {3'b100, XER.SO}", "PC", "PC + 4");
+		semanSet.add(item);
+		item = new Item("CR[7] = {3'b010, XER.SO}", "PC", "PC + 4");
+		semanSet.add(item);
+		seman = new Semantic(semanSet);
+		data.add(seman);
+		
+		return data;
+	}
+	
+	public static List<Semantic> test4() {
+		List<Semantic> data = new ArrayList<Semantic>();
+		Item item;
+		List<Item> semanSet;
+		Semantic seman;
+
+		semanSet = new ArrayList<Item>();
+		item = new Item("CR[7] = {3'b001, XER.SO}", "PC", "(PC + {16{Address_1[0]}, Address_1, 2'b0})");	
+		semanSet.add(item);
+		item = new Item("CR[7] = {3'b100, XER.SO}", "PC", "PC + 4");
+		semanSet.add(item);
+		item = new Item("CR[7] = {3'b010, XER.SO}", "PC", "PC + 4");
+		semanSet.add(item);
+		seman = new Semantic(semanSet);
+		data.add(seman);
+		
+		semanSet = new ArrayList<Item>();
+		item = new Item("PC", "{6{Address_2[0]}, Address_2, 2'b0}");
+		semanSet.add(item);
+		seman = new Semantic(semanSet);
+		data.add(seman);
+		
+		return data;
+	}
+	
 	public static void main(String[] args) {
-		List<Semantic> semanTest = test2();
+		List<Semantic> semanTest = test4();
 		CompileVerification cv = new CompileVerification();
 		Tool.printSemanticList(semanTest);
-		System.out.println("******************************\n\n");
+		System.out.println("**************************************************\n\n");
 		List<Semantic> result = cv.verificationProcess(semanTest);
 		Tool.printSemanticList(result);
 	}

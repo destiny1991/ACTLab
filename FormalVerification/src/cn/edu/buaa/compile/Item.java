@@ -5,7 +5,7 @@ package cn.edu.buaa.compile;
  * @author destiny
  *
  */
-public class Item {
+public class Item implements Cloneable {
 	private String premise;		//存储前提
 	private String left;		//存储语句
 	private String right;		
@@ -27,6 +27,19 @@ public class Item {
 		this.right = right;
 	}
 
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		Object obj = super.clone(); 
+		
+		//添加如下代码实现深复制
+		Item s = (Item) obj;
+		s.premise = this.premise;
+		s.left = this.left;
+		s.right = this.right;
+		
+		return obj;
+	}
+	
 	public String getPremise() {
 		return premise;
 	}

@@ -160,15 +160,6 @@ public class CompileVerification {
 		return semanSet;
 	}
 	
-	public List<Semantic>  cloneSemanFromCodeSet(List<Instruction> codeSet) {
-		List<Semantic> ts = new ArrayList<Semantic>();
-		for(Instruction inst : codeSet) {
-			Semantic t = inst.getSeman();
-			ts.add(t);
-		}
-		return ts;
-	}
-	
 	public void runApp(String inputFile, String regex) {
 		File file = new File(inputFile);
 		
@@ -195,10 +186,10 @@ public class CompileVerification {
 			/**
 			 * 基于指称语义进行推导
 			 */
-			semanSrc = cloneSemanFromCodeSet(codeSet);
+			semanSrc = Tool.cloneSemanFromCodeSet(codeSet);
 			Tool.printSemanticList(semanSrc);
 			result = verificationProcess(semanSrc);
-			System.out.println("******************************\n\n");
+			System.out.println("**************************************************\n\n");
 			Tool.printSemanticList(result);
 			
 		} catch (FileNotFoundException e) {
