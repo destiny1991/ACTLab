@@ -16,6 +16,7 @@ import java.util.Map;
  */
 public class CompileVerification {
 	private List<Instruction> codeSet;
+	private List<Semantic> semanSrc;
 	private List<Semantic> result;
 	
 	public CompileVerification() {
@@ -58,9 +59,48 @@ public class CompileVerification {
 	 * @return
 	 */
 	public Item solveTwoItem(Item item1, Item item2) {
-		if(null == item2.getPremise() && null == item2.getRight()) return item1;
-		else if(null == item2.getPremise()) {
-			
+		if(null == item2.getPremise() && null == item2.getRight()) {
+			return item1;
+		} else if(null == item2.getPremise()) {
+			if(null == item1.getPremise() && null == item1.getRight()) {
+				return item1;
+			} else if(null == item1.getPremise()) {
+				if(item1.getLeft().equals(item2.getLeft())) {
+					item2.setRight(item1.getRight());
+				} else {
+					return item1;
+				}
+			} else {
+				String str = item2.getLeft() + " = " + item2.getRight();
+				if(item1.getPremise().equals(str)) {
+					item1.setPremise(null);
+					return item1;
+				} else {
+					return item1;
+				}
+			}
+		} else {
+			if(null == item1.getPremise() && null == item1.getRight()) {
+				return item1;
+			} else if(null == item1.getPremise()) {
+				if(item1.getLeft().equals(item2.getLeft())) {
+					if(!item2.getLeft().equals("PC")) {
+						item2.setRight(item1.getRight());
+					} else {
+						return item1;
+					}
+				} else {
+					return item1;
+				}
+			} else {
+				String str = item2.getLeft() + " = " + item2.getRight();
+				if(item1.getPremise().equals(str)) {
+					item2.setLeft(item1.getLeft());
+					item2.setRight(item1.getRight());
+				} else {
+					return item1;
+				}
+			}
 		}
 		
 		return null;
@@ -72,33 +112,54 @@ public class CompileVerification {
 	 * @param smt2	对semanSet已存在的语义，只能增加和修改
 	 * @return
 	 */
-	public Semantic solveTwoSemantic(Semantic smt1, Semantic smt2) {
-		List<Item> tmp = new ArrayList<Item>();
-		
-		for(Item item2 : smt2.getSemanSet()) {
-			for(Item item1 : smt1.getSemanSet()) {
-				Item e = solveTwoItem(item1, item2);
-				if(null != tmp) tmp.add(e);
+	public void solveTwoSemantic(Semantic smt1, Semantic smt2) {
+		//用已经存在的语义对新加的语义进行化简
+		for(int i=0; i<smt1.getSemanSet().size(); i++) {
+			Item item1 = smt1.getSemanSet().get(i);
+			boolean isAdd = true;
+			for(int j=0; j<smt2.getSemanSet().size(); j++) {
+				Item item2 = smt2.getSemanSet().get(j);
+				if(null == solveTwoItem(item1, item2)) {
+					isAdd = false;
+				}
+			}
+			if(!isAdd) {
+				smt1.getSemanSet().remove(i);
+				i--;
 			}
 		}
 		
-		if(0 == tmp.size()) return null;
-		else return new Semantic(tmp);
+		
+		
+		//去掉三选一的情况
+//		for() {
+//			
+//		}
+		
 	}
 	
-	public List<Semantic> verificationProcess(List<Instruction> codeSet) {
+	public List<Semantic> verificationProcess(List<Semantic> semanSrc) {
 		List<Semantic> semanSet = new ArrayList<Semantic>();
 		
-		for(int i=0; i<codeSet.size(); i++) {
-			Semantic smt1 = codeSet.get(i).getSeman();	//code当前遍历到的语义
+		for(int i=0; i<semanSrc.size(); i++) {
+			Semantic smt1 = semanSrc.get(i);		//code当前遍历到的语义
 			for(int j=0; j<semanSet.size(); j++) {
-				Semantic smt2 = semanSet.get(j);		//已存在semanSet中的语义
-				Semantic e = solveTwoSemantic(smt1, smt2);
-				if(null != e) semanSet.add(e);			//对semanSet已存在的语义，只能增加和修改
+				Semantic smt2 = semanSet.get(j);	//已存在semanSet中的语义
+				solveTwoSemantic(smt1, smt2);
 			}
+			if(0 != smt1.getSemanSet().size()) semanSet.add(smt1);	//增加或修改
 		}
 				
 		return semanSet;
+	}
+	
+	public List<Semantic>  cloneSemanFromCodeSet(List<Instruction> codeSet) {
+		List<Semantic> ts = new ArrayList<Semantic>();
+		for(Instruction inst : codeSet) {
+			Semantic t = inst.getSeman();
+			ts.add(t);
+		}
+		return ts;
 	}
 	
 	public void runApp(String inputFile, String regex) {
@@ -122,13 +183,16 @@ public class CompileVerification {
 			codeSet = createInstructionSet(reader, regex);
 			if(null == codeSet || 0 == codeSet.size()) return;
 //			Tool.printCodeSet(codeSet);
-			Tool.printCodeSemantic(codeSet);
+//			Tool.printCodeSemantic(codeSet);
 			
 			/**
 			 * 基于指称语义进行推导
 			 */
-//			result = verificationProcess(codeSet);
-//			Tool.printSemanticList(result);
+			semanSrc = cloneSemanFromCodeSet(codeSet);
+			Tool.printSemanticList(semanSrc);
+			result = verificationProcess(semanSrc);
+			System.out.println("******************************\n\n");
+			Tool.printSemanticList(result);
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
