@@ -1,7 +1,12 @@
-package cn.edu.buaa.compile;
+package cn.edu.buaa.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.edu.buaa.compile.CompileVerification;
+import cn.edu.buaa.compile.Item;
+import cn.edu.buaa.compile.Semantic;
+import cn.edu.buaa.compile.Tool;
 
 public class Test {
 	public static List<Semantic> test1() {
