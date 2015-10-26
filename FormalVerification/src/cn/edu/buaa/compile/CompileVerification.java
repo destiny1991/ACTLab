@@ -175,6 +175,7 @@ public class CompileVerification {
 								)
 						);
 			
+			long start = System.currentTimeMillis();
 			/**
 			 * 把输入的汇编代码翻译成对应的指称语义形式
 			 */
@@ -187,10 +188,14 @@ public class CompileVerification {
 			 * 基于指称语义进行推导
 			 */
 			semanSrc = Tool.cloneSemanFromCodeSet(codeSet);
-			Tool.printSemanticList(semanSrc);
+//			Tool.printSemanticList(semanSrc);
 			result = verificationProcess(semanSrc);
-			System.out.println("**************************************************\n\n");
+			long end =  System.currentTimeMillis();
+			System.out.println("数值代入和推导耗时：" + (end - start) + " ms");
+			
+			System.out.println("\n\n**************************************************");
 			Tool.printSemanticList(result);
+			
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
