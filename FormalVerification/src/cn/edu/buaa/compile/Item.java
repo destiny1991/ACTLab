@@ -14,7 +14,11 @@ public class Item {
 	}
 	
 	public Item(String body) {
-		left = body;
+		this(null, body, null);
+	}
+	
+	public Item(String left, String right) {
+		this(null, left, right);
 	}
 	
 	public Item(String premise, String left, String right) {

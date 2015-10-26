@@ -128,13 +128,20 @@ public class CompileVerification {
 				i--;
 			}
 		}
-		
-		
-		
+				
 		//去掉三选一的情况
-//		for() {
-//			
-//		}
+		for(int i=0; i<smt1.getSemanSet().size(); i++) {
+			Item a = smt1.getSemanSet().get(i);
+			if(null != a.getPremise()) {
+				for(int j=0; j<smt1.getSemanSet().size(); j++) {
+					Item b = smt1.getSemanSet().get(j);
+					if(null == b.getPremise() && a.getLeft().equals(b.getLeft())) {
+						smt1.getSemanSet().remove(i);
+						i--;
+					}
+				}
+			}
+		}
 		
 	}
 	
