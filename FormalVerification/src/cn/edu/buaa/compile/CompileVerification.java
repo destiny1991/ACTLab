@@ -160,8 +160,9 @@ public class CompileVerification {
 		return semanSet;
 	}
 	
-	public void runApp(String inputFile, String regex) {
+	public void runApp(String inputFile) {
 		File file = new File(inputFile);
+		String regex = "\t| |,|\\(|\\)";
 		
 		BufferedReader reader = null;
 		
@@ -181,21 +182,19 @@ public class CompileVerification {
 			 */
 			codeSet = createInstructionSet(reader, regex);
 			if(null == codeSet || 0 == codeSet.size()) return;
-//			Tool.printCodeSet(codeSet);
-//			Tool.printCodeSemantic(codeSet);
 			
 			/**
 			 * 基于指称语义进行推导
 			 */
 			semanSrc = Tool.cloneSemanFromCodeSet(codeSet);
-			Tool.printSemanticList(semanSrc);
 			result = verificationProcess(semanSrc);
 			long end =  System.currentTimeMillis();
-//			System.out.println("数值代入和推导耗时：" + (end - start) + " ms");
-			
 			Tool.saveResult(inputFile, result);
-			System.out.println("\n\n**************************************************");
+			
+			Tool.printCodeSemantic(codeSet);
+			System.out.println("**************************************************");
 			Tool.printSemanticList(result);			
+			System.out.println("\n数值代入和推导耗时：" + (end - start) + " ms");
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -214,8 +213,7 @@ public class CompileVerification {
 		
 	public static void main(String[] args) {
 		CompileVerification cv = new CompileVerification();
-		String inputPath = "src/cn/edu/buaa/resources/for.txt";
-		String regex = "\t| |,|\\(|\\)";
-		cv.runApp(inputPath, regex);
+		String inputPath = "src/cn/edu/buaa/resources/do-while.txt";
+		cv.runApp(inputPath);
 	}
 }
