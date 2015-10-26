@@ -193,9 +193,9 @@ public class CompileVerification {
 			long end =  System.currentTimeMillis();
 			System.out.println("数值代入和推导耗时：" + (end - start) + " ms");
 			
+			Tool.saveResult(inputFile, result);
 			System.out.println("\n\n**************************************************");
-			Tool.printSemanticList(result);
-			
+			Tool.printSemanticList(result);			
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -214,7 +214,7 @@ public class CompileVerification {
 		
 	public static void main(String[] args) {
 		CompileVerification cv = new CompileVerification();
-		String inputPath = "src/cn/edu/buaa/resources/assembly.txt";
+		String inputPath = "src/cn/edu/buaa/resources/if.txt";
 		String regex = "\t| |,|\\(|\\)";
 		cv.runApp(inputPath, regex);
 	}

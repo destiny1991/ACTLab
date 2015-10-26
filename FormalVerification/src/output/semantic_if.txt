@@ -1,0 +1,16 @@
+<EXP>
+
+GPR[0] < {16{0[16]}, 0} -> PC = PC + 4
+GPR[0] > {16{0[16]}, 0} -> PC = PC + 4
+GPR[0] = {16{0[16]}, 0} -> PC = (PC + {16{Address_1[0]}, Address_1, 2'b0})
+
+<STA-LIST1>
+
+PC = PC + {6{Address_2[0]}, Address_2, 2'b0}
+
+Address_1:
+
+<STA-LIST2>
+
+Address_2:
+

@@ -1,5 +1,11 @@
 package cn.edu.buaa.compile;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +55,61 @@ public class Tool {
 			res.add(s);
 		}
 		return res;
+	}
+	
+	/**
+	 * 把推语义List写入文本文件
+	 * @param inputFile
+	 * @param seman
+	 */
+	public static void saveResult(String inputFile, List<Semantic> seman) {
+		int index = inputFile.lastIndexOf('/');
+		String name = inputFile.substring(index + 1);
+		String outputName = "semantic_" + name;
+		File file = new File("src/output/" + outputName);
+		if(!file.exists()){  
+		    try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}  
+		}  
+		
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(
+					new OutputStreamWriter(
+							new FileOutputStream(file)
+							)
+					);
+			for(Semantic s : seman) {
+				for(Item e : s.getSemanSet()) {
+					if(null == e.getPremise() && null == e.getRight()) {
+						writer.write(e.getLeft());
+					} else if(null == e.getPremise()) {
+						writer.write(e.getLeft() + " = " + e.getRight());
+					} else {
+						String str = e.getPremise() + " -> " + e.getLeft() + " = " + e.getRight();
+						writer.write(str);
+					}
+					writer.newLine();
+				}
+				writer.newLine();
+				writer.flush();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} finally {
+			if(null != writer) {
+				try {
+					writer.close();
+				} catch (IOException e) {
+				e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	/**
