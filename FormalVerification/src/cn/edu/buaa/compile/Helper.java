@@ -31,6 +31,11 @@ public class Helper {
 			paras.put("AA", "0");
 			paras.put("LK", "0");
 			break;
+		case "lwz":
+			paras.put("rD", lines[1]);
+			paras.put("D", lines[2]);
+			paras.put("rA", lines[3]);
+			break;
 		default:
 			break;
 		}
@@ -115,6 +120,19 @@ public class Helper {
 			premise = null;
 			left = "PC";
 			right = "PC + {6{" + paras.get("LI") + "[0]}, " + paras.get("LI") + ", 2'b0}";
+			item = new Item(premise, left, right);
+			semanSet.add(item);
+			break;
+		case "lwz":
+			premise = null;
+			left = "GPR[" + paras.get("rD") + "]";
+			int rA = Integer.parseInt(paras.get("rA"));
+			if(0 == rA) {
+				right = "MEM({16{" + paras.get("D") + "[16]}, " + paras.get("D") + "}, 4)";
+			} else {
+				right = "MEM(GPR[" + paras.get("rA") + "] + {16{" 
+						+ paras.get("D") + "[16]}, " + paras.get("D") + "},4)";
+			}
 			item = new Item(premise, left, right);
 			semanSet.add(item);
 			break;

@@ -66,7 +66,11 @@ public class CompileVerification {
 				return item1;
 			} else if(null == item1.getPremise()) {
 				if(item1.getLeft().equals(item2.getLeft())) {
-					item2.setRight(item1.getRight());
+					if(!item2.getLeft().equals("PC")) {
+						item2.setRight(item1.getRight());
+					} else {
+						return item1;
+					}
 				} else {
 					return item1;
 				}
@@ -213,7 +217,7 @@ public class CompileVerification {
 		
 	public static void main(String[] args) {
 		CompileVerification cv = new CompileVerification();
-		String inputPath = "src/cn/edu/buaa/resources/if.txt";
+		String inputPath = "src/cn/edu/buaa/resources/switch.txt";
 		cv.runApp(inputPath);
 	}
 }
