@@ -29,14 +29,7 @@ public class Item implements Cloneable {
 
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		Object obj = super.clone(); 
-		
-		//添加如下代码实现深复制
-		Item s = (Item) obj;
-		s.premise = this.premise;
-		s.left = this.left;
-		s.right = this.right;
-		
+		Object obj = super.clone(); 		
 		return obj;
 	}
 	
