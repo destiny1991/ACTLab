@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 用来帮助生成指令的相关属性，随着后续更多代码的增加，此文件会不断被修改
  * @author destiny
  *
  */
-public class Helper {
+public class Helper {	
 	public static Map<String, String> generateParas(String[] lines) {
 		Map<String, String> paras = new HashMap<String, String>();
 		switch (lines[0]) {
@@ -41,103 +42,84 @@ public class Helper {
 		}
 		return paras;
 	}
-	
-	public static Semantic generateSemantic(String name, Map<String, String> paras) {
-		Semantic seman = new Semantic();
-		List<Item> semanSet = new ArrayList<Item>();
-		seman.setSemanSet(semanSet);
-		String premise;
-		String left;
-		String right;
-		Item item;
 		
+	public static void pretreat(List<Item> semanSet, String name, List<Item> ts, 
+			Map<String, String> paras) {
 		switch (name) {
-		case "cmpi":
-			premise = "GPR[" + paras.get("rA") + "] < {16{" 
-							+ paras.get("SIMM") + "[16]}, " + paras.get("SIMM") + "}";
-			left = "CR[" + paras.get("crfD") + "]";
-			right = "{3'b100, XER.SO}";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			
-			premise = "GPR[" + paras.get("rA") + "] > {16{" 
-					+ paras.get("SIMM") + "[16]}, " + paras.get("SIMM") + "}";
-			left = "CR[" + paras.get("crfD") + "]";
-			right = "{3'b010, XER.SO}";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			
-			premise = "GPR[" + paras.get("rA") + "] = {16{" 
-					+ paras.get("SIMM") + "[16]}, " + paras.get("SIMM") + "}";
-			left = "CR[" + paras.get("crfD") + "]";
-			right = "{3'b001, XER.SO}";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
-			
-			break;
 		case "bc":
 			int bo =  Integer.parseInt(paras.get("BO"));
 			if((bo & 1<<2) > 0 && 0 == (bo & 1<<3)) {
-				premise = "CR[" + paras.get("BI") + "] = {3'b100, XER.SO}";
-				left = "PC";
-				right = "PC + 4";
-				item = new Item(premise, left, right);
+				Item item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
 				semanSet.add(item);
-				
-				premise = "CR[" + paras.get("BI") + "] = {3'b010, XER.SO}";
-				left = "PC";
-				right = "PC + 4";
-				item = new Item(premise, left, right);
+				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
 				semanSet.add(item);
-				
-				premise = "CR[" + paras.get("BI") + "] = {3'b001, XER.SO}";
-				left = "PC";
-				right = "(PC + {16{" + paras.get("BD") + "[0]}, " + paras.get("BD") + ", 2'b0})";
-				item = new Item(premise, left, right);
+				item = new Item("CR[BI] = {3'b001, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
 				semanSet.add(item);
 			} else if((bo & 1<<2) > 0 && (bo & 1<<3) > 0) {
-				premise = "CR[" + paras.get("BI") + "] = {3'b100, XER.SO}";
-				left = "PC";
-				right = "PC + 4";
-				item = new Item(premise, left, right);
+				Item item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
 				semanSet.add(item);
-				
-				premise = "CR[" + paras.get("BI") + "] = {3'b010, XER.SO}";
-				left = "PC";
-				right = "(PC + {16{" + paras.get("BD") + "[0]}, " + paras.get("BD") + ", 2'b0})";
-				item = new Item(premise, left, right);
+				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
 				semanSet.add(item);
-				
-				premise = "CR[" + paras.get("BI") + "] = {3'b001, XER.SO}";
-				left = "PC";
-				right = "PC + 4";
-				item = new Item(premise, left, right);
+				item = new Item("CR[BI] = {3'b001, XER.SO}",  ts.get(6).getLeft(), ts.get(6).getRight());
 				semanSet.add(item);
-			}
-
+			}			
 			break;
 		case "b":
-			premise = null;
-			left = "PC";
-			right = "PC + {6{" + paras.get("LI") + "[0]}, " + paras.get("LI") + ", 2'b0}";
-			item = new Item(premise, left, right);
-			semanSet.add(item);
+			int AA = Integer.parseInt(paras.get("AA"));
+			for(Item e : ts) {
+				if(e.getPremise().equals("AA = " + AA)) {
+					Item item = new Item(null, e.getLeft(), e.getRight());
+					semanSet.add(item);
+				}
+			}
 			break;
 		case "lwz":
-			premise = null;
-			left = "GPR[" + paras.get("rD") + "]";
 			int rA = Integer.parseInt(paras.get("rA"));
-			if(0 == rA) {
-				right = "MEM({16{" + paras.get("D") + "[16]}, " + paras.get("D") + "}, 4)";
-			} else {
-				right = "MEM(GPR[" + paras.get("rA") + "] + {16{" 
-						+ paras.get("D") + "[16]}, " + paras.get("D") + "},4)";
+			for(Item e : ts) {
+				if(e.getPremise().equals("rA = " + rA)) {
+					Item item = new Item(null, e.getLeft(), e.getRight());
+					semanSet.add(item);
+				}
 			}
-			item = new Item(premise, left, right);
-			semanSet.add(item);
 			break;
 		default:
+			for(Item e : ts) {	
+				try {
+					Item item = (Item) e.clone();
+					semanSet.add(item);
+				} catch (CloneNotSupportedException e1) {
+					e1.printStackTrace();
+				}
+			}
 			break;
+		}
+	}
+	
+	public static Semantic generateSemantic(String name, Map<String, String> paras, 
+			Map<String, Semantic> axiomSet) {
+		List<Item> semanSet = new ArrayList<Item>();
+		Semantic seman = new Semantic(semanSet);
+		List<Item> ts = axiomSet.get(name).getSemanSet();
+		
+		pretreat(semanSet, name, ts, paras);
+		
+		Set<String> set = paras.keySet();
+		for(String key : set) {
+			String value = paras.get(key);
+			for(Item item : seman.getSemanSet()) {
+				if(null != item.getPremise()) {
+					String tmp = item.getPremise().replaceAll(key, value);
+					item.setPremise(tmp);
+				}
+				if(null != item.getLeft()) {
+					String tmp = item.getLeft().replaceAll(key, value);
+					item.setLeft(tmp);
+				}
+				if(null != item.getRight()) {
+					String tmp = item.getRight().replaceAll(key, value);
+					item.setRight(tmp);
+				}
+			}
 		}
 		return seman;
 	}

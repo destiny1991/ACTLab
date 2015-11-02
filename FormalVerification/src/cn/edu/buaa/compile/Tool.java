@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Tool {
@@ -193,6 +194,28 @@ public class Tool {
 	public static void printCodeSemantic(List<Instruction> codeSet) {
 		for(Instruction ins : codeSet) {
 			List<Item> semanSet = ins.getSeman().getSemanSet();
+			for(Item item : semanSet) {
+				if(null == item.getPremise() && null == item.getRight()) {
+					System.out.println(item.getLeft());
+				} else if(null == item.getPremise()) {
+					System.out.println(item.getLeft() + " = " + item.getRight());
+				} else {
+					System.out.println(item.getPremise() + " -> " 
+							+ item.getLeft() + " = " + item.getRight());
+				}
+			}
+			System.out.println();
+		}
+	}
+	
+	/**
+	 * 输出公理所在的Map
+	 */
+	public static void printMap(Map<String, Semantic> axiomSet) {
+		Set<String> set = axiomSet.keySet();
+		for(String key : set) {
+			Semantic seman = axiomSet.get(key);
+			List<Item> semanSet = seman.getSemanSet();
 			for(Item item : semanSet) {
 				if(null == item.getPremise() && null == item.getRight()) {
 					System.out.println(item.getLeft());
