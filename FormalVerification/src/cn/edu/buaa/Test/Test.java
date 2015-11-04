@@ -106,8 +106,29 @@ public class Test {
 		return data;
 	}
 	
+	public static List<Semantic> test5() {
+		List<Semantic> data = new ArrayList<Semantic>();
+		Item item;
+		List<Item> semanSet;
+		Semantic seman;
+		
+		semanSet = new ArrayList<Item>();
+		item = new Item("GPR[11]", "MEM(GPR[31] + {16{<VAR1>.Offset[16]}, <VAR1>.Offset}, 4)");
+		semanSet.add(item);
+		seman = new Semantic(semanSet);
+		data.add(seman);
+		
+		semanSet = new ArrayList<Item>();
+		item = new Item("!(((GPR[11] = -231) & (GPR[0] = -1)) | (GPR[0] = 0))", "GPR[9]", "GPR[11] / GPR[0]");
+		semanSet.add(item);
+		seman = new Semantic(semanSet);
+		data.add(seman);
+		
+		return data;
+	}
+	
 	public static void main(String[] args) {
-		List<Semantic> semanTest = test4();
+		List<Semantic> semanTest = test5();
 		CompileVerification cv = new CompileVerification();
 		Tool.printSemanticList(semanTest);
 		System.out.println("**************************************************\n\n");

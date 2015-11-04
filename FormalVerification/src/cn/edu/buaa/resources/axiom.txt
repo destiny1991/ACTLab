@@ -25,3 +25,28 @@ lwz
 rA = 0	GPR[rD]	MEM({16{D[16]}, D}, 4)
 rA = 1	GPR[rD]	MEM(GPR[rA] + {16{D[16]}, D}, 4)
 lwz
+
+divw
+((GPR[rA] = -231) & (GPR[rB] = -1)) | (GPR[rB] = 0)	GPR[rD]	undefined
+!(((GPR[rA] = -231) & (GPR[rB] = -1)) | (GPR[rB] = 0))	GPR[rD]	GPR[rA] / GPR[rB]
+((GPR[rA] = -231) & (GPR[rB] = -1)) | (GPR[rB] = 0) && OE = 1	XER	{1,1}
+((GPR[rA] = -231) & (GPR[rB] = -1)) | (GPR[rB] = 0) && Rc = 1	CR[0]	{undefined, undefined, undefined, 1}
+!(((GPR[rA] = -231) & (GPR[rB] = -1)) | (GPR[rB] = 0)) && OE = 1	XER	{XER.SO, 0}
+!(((GPR[rA] = -231) & (GPR[rB] = -1)) | (GPR[rB] = 0)) && Rc = 1	CR[0]	{GPR[rA] / GPR[rB] < 0, GPR[rA] / GPR[rB] > 0, GPR[rA] / GPR[rB] = 0, XER.SO}
+divw
+
+mullw
+GPR[rD]	(GPR[rA] * GPR[rB])[32:63]
+OE = 1	XER.SO	XER.SO | (GPR[rA] * GPR[rB] != 320) & (GPR[rA] * GPR[rB] != 321)
+OE = 1	XER.OV	(GPR[rA] * GPR[rB] != 320) & (GPR[rA] * GPR[rB] != 321)
+Rc = 1 && OE = 1	CR[0]	{GPR[rA] * GPR[rB] < 0, GPR[rA] * GPR[rB] > 0, GPR[rA] * GPR[rB] = 0, XER.SO | (GPR[rA] * GPR[rB] != 320) & (GPR[rA] * GPR[rB] != 321)}
+Rc = 1 && OE = 0	CR[0]	{GPR[rA] * GPR[rB] < 0, GPR[rA] * GPR[rB] > 0, GPR[rA] * GPR[rB] = 0, XER.SO}
+mullw
+
+subf
+GPR[rD]	~GPR[rA] + GPR[rB] +1
+OE = 1	XER.SO	XER.SO | OverFlow(~GPR[rA] + GPR[rB] +1)
+OE = 1	XER.OV	OverFlow(~GPR[rA] + GPR[rB] +1)
+Rc = 1 && OE = 1	CR[0]	{~GPR[rA] + GPR[rB] + 1< 0, ~GPR[rA] + GPR[rB] + 1 > 0, ~GPR[rA] + GPR[rB] + 1 = 0, XER.SO | OverFlow(~GPR[rA] + GPR[rB] + 1)}
+Rc = 1 && OE = 0	CR[0]	{~GPR[rA] + GPR[rB] + 1< 0, ~GPR[rA] + GPR[rB] + 1 > 0, ~GPR[rA] + GPR[rB] + 1 = 0, XER.SO}
+subf

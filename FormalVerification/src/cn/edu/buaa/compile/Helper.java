@@ -37,6 +37,15 @@ public class Helper {
 			paras.put("D", lines[2]);
 			paras.put("rA", lines[3]);
 			break;
+		case "divw":
+		case "mullw":
+		case "subf":
+			paras.put("rD", lines[1]);
+			paras.put("rA", lines[2]);
+			paras.put("rB", lines[3]);
+			paras.put("OE", "0");
+			paras.put("Rc", "0");
+			break;
 		default:
 			break;
 		}
@@ -45,18 +54,19 @@ public class Helper {
 		
 	public static void pretreat(List<Item> semanSet, String name, List<Item> ts, 
 			Map<String, String> paras) {
+		Item item = null;
 		switch (name) {
 		case "bc":
 			int bo =  Integer.parseInt(paras.get("BO"));
 			if((bo & 1<<2) > 0 && 0 == (bo & 1<<3)) {
-				Item item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
+				item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
 				semanSet.add(item);
 				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
 				semanSet.add(item);
 				item = new Item("CR[BI] = {3'b001, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
 				semanSet.add(item);
 			} else if((bo & 1<<2) > 0 && (bo & 1<<3) > 0) {
-				Item item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
+				item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
 				semanSet.add(item);
 				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
 				semanSet.add(item);
@@ -68,7 +78,7 @@ public class Helper {
 			int AA = Integer.parseInt(paras.get("AA"));
 			for(Item e : ts) {
 				if(e.getPremise().equals("AA = " + AA)) {
-					Item item = new Item(null, e.getLeft(), e.getRight());
+					item = new Item(null, e.getLeft(), e.getRight());
 					semanSet.add(item);
 				}
 			}
@@ -78,16 +88,30 @@ public class Helper {
 			if(0 != rA) rA = 1;
 			for(Item e : ts) {
 				if(e.getPremise().equals("rA = " + rA)) {
-					Item item = new Item(null, e.getLeft(), e.getRight());
+					item = new Item(null, e.getLeft(), e.getRight());
 					semanSet.add(item);
 					return;
 				}
 			}
 			break;
+		case "divw":
+			item = new Item(ts.get(0).getPremise(), ts.get(0).getLeft(), ts.get(0).getRight());
+			semanSet.add(item);
+			item = new Item(ts.get(1).getPremise(), ts.get(1).getLeft(), ts.get(1).getRight());
+			semanSet.add(item);
+			break;
+		case "mullw":
+			item = new Item(ts.get(0).getPremise(), ts.get(0).getLeft(), ts.get(0).getRight());
+			semanSet.add(item);
+			break;
+		case "subf":
+			item = new Item(ts.get(0).getPremise(), ts.get(0).getLeft(), ts.get(0).getRight());
+			semanSet.add(item);
+			break;
 		default:
 			for(Item e : ts) {	
 				try {
-					Item item = (Item) e.clone();
+					item = (Item) e.clone();
 					semanSet.add(item);
 				} catch (CloneNotSupportedException e1) {
 					e1.printStackTrace();

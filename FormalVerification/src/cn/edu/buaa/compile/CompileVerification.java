@@ -34,9 +34,10 @@ public class CompileVerification {
 			if(null == item1.getPremise() && null == item1.getRight()) {
 				return item1;
 			} else if(null == item1.getPremise()) {
+				item1.setRight(item1.getRight().replace(item2.getLeft(), item2.getRight()));
 				if(item1.getLeft().equals(item2.getLeft())) {
 					if(!item2.getLeft().equals("PC")) {
-						item2.setRight(item1.getRight());
+						return null;
 					} else {
 						return item1;
 					}
@@ -44,10 +45,15 @@ public class CompileVerification {
 					return item1;
 				}
 			} else {
+				item1.setRight(item1.getRight().replace(item2.getLeft(), item2.getRight()));
 				String str = item2.getLeft() + " = " + item2.getRight();
 				if(item1.getPremise().equals(str)) {
 					item1.setPremise(null);
-					return item1;
+					if(item1.getLeft().equals(item2.getLeft())) {
+						return null;
+					} else {
+						return item1;
+					}
 				} else {
 					return item1;
 				}
@@ -59,46 +65,38 @@ public class CompileVerification {
 				if(item1.getLeft().equals(item2.getLeft())) {
 					if(!item2.getLeft().equals("PC")) {
 						item2.setRight(item1.getRight());
-					} else {
-						return item1;
 					}
-				} else {
-					return item1;
 				}
+				return item1;
 			} else {
 				String str = item2.getLeft() + " = " + item2.getRight();
 				if(item1.getPremise().equals(str)) {
-					item2.setLeft(item1.getLeft());
-					item2.setRight(item1.getRight());
+					item1.setPremise(item2.getPremise());
+					return null;
 				} else {
 					return item1;
 				}
 			}
 		}
-		
-		return null;
 	}
 	
 	/**
 	 * 
 	 * @param smt1	code当前遍历到的语义
-	 * @param smt2	对semanSet已存在的语义，只能增加和修改
+	 * @param smt2	semanSet已存在的语义
 	 * @return
 	 */
 	public void solveTwoSemantic(Semantic smt1, Semantic smt2) {
-		//用已经存在的语义对新加的语义进行化简
+		//用新加入的语义对已存在的语义进行化简
 		for(int i=0; i<smt1.getSemanSet().size(); i++) {
 			Item item1 = smt1.getSemanSet().get(i);
-			boolean isAdd = true;
 			for(int j=0; j<smt2.getSemanSet().size(); j++) {
 				Item item2 = smt2.getSemanSet().get(j);
+				//null, 已存在的语义删去
 				if(null == solveTwoItem(item1, item2)) {
-					isAdd = false;
+					smt2.getSemanSet().remove(j);
+					j--;
 				}
-			}
-			if(!isAdd) {
-				smt1.getSemanSet().remove(i);
-				i--;
 			}
 		}
 				
@@ -126,8 +124,12 @@ public class CompileVerification {
 			for(int j=0; j<semanSet.size(); j++) {
 				Semantic smt2 = semanSet.get(j);	//已存在semanSet中的语义
 				solveTwoSemantic(smt1, smt2);
+				if(0 == smt2.getSemanSet().size()) {
+					semanSet.remove(j);
+					j--;
+				}
 			}
-			if(0 != smt1.getSemanSet().size()) semanSet.add(smt1);	//增加或修改
+			if(0 != smt1.getSemanSet().size()) semanSet.add(smt1);	//增加			
 		}
 				
 		return semanSet;
@@ -277,7 +279,7 @@ public class CompileVerification {
 		
 	public static void main(String[] args) {
 		CompileVerification cv = new CompileVerification();
-		String inputPath = "src/input/if.txt";
+		String inputPath = "src/input/while.txt";
 		cv.runApp(inputPath);
 	}
 }
