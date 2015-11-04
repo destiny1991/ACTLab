@@ -277,7 +277,7 @@ public class CompileVerification {
 		
 	public static void main(String[] args) {
 		CompileVerification cv = new CompileVerification();
-		String inputPath = "src/cn/edu/buaa/resources/while.txt";
+		String inputPath = "src/input/if.txt";
 		cv.runApp(inputPath);
 	}
 }

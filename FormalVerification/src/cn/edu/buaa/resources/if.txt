@@ -1,8 +1,0 @@
-<EXP>
-cmpi	7, 0, 0, 0
-bc	4, 7, Address_1
-<STA-LIST1>
-b	Address_2
-Address_1: 
-<STA-LIST2>
-Address_2:

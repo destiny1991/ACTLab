@@ -75,10 +75,12 @@ public class Helper {
 			break;
 		case "lwz":
 			int rA = Integer.parseInt(paras.get("rA"));
+			if(0 != rA) rA = 1;
 			for(Item e : ts) {
 				if(e.getPremise().equals("rA = " + rA)) {
 					Item item = new Item(null, e.getLeft(), e.getRight());
 					semanSet.add(item);
+					return;
 				}
 			}
 			break;
@@ -107,16 +109,17 @@ public class Helper {
 		for(String key : set) {
 			String value = paras.get(key);
 			for(Item item : seman.getSemanSet()) {
+				String nkey = "\\b" + key + "\\b";
 				if(null != item.getPremise()) {
-					String tmp = item.getPremise().replaceAll(key, value);
+					String tmp = item.getPremise().replaceAll(nkey, value);
 					item.setPremise(tmp);
 				}
 				if(null != item.getLeft()) {
-					String tmp = item.getLeft().replaceAll(key, value);
+					String tmp = item.getLeft().replaceAll(nkey, value);
 					item.setLeft(tmp);
 				}
 				if(null != item.getRight()) {
-					String tmp = item.getRight().replaceAll(key, value);
+					String tmp = item.getRight().replaceAll(nkey, value);
 					item.setRight(tmp);
 				}
 			}
