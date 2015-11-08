@@ -1,10 +1,72 @@
 package cn.edu.buaa.compile;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Option {
+	
+	public static Map<String, Semantic> loadAxiom1() {
+		BufferedReader reader = null;
+		Map<String, Semantic> axiom = new HashMap<String, Semantic>(); 
+		try {
+			reader = new BufferedReader(
+						new InputStreamReader(
+								new FileInputStream("src/cn/edu/buaa/resources/axiom.txt")
+								)
+						);
+			
+			String line;
+			String name = null;
+			while(null != (line = reader.readLine())) {
+				line = line.trim();
+				if(0 == line.length()) continue;
+				if(null == name) {
+					name = line;
+					List<Item> semanSet = new ArrayList<Item>();
+					Semantic seman = new Semantic(semanSet);
+					while(!name.equals(line = reader.readLine().trim())) {
+						if(0 == line.length()) continue;
+						String[] lines = line.split("\t");
+						lines = Tool.filterOtherSignal(lines);
+						Item item = null;
+						if(1 == lines.length) {
+							item = new Item(lines[0]);
+						} else if(2 == lines.length) {
+							item = new Item(lines[0], lines[1]);
+						} else if(3 == lines.length) {
+							item = new Item(lines[0], lines[1], lines[2]);
+						} else {
+							item = null;
+						}
+						if(null != item) semanSet.add(item);
+					}
+					axiom.put(name, seman);
+					name = null;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if(null != reader) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return axiom;
+	}
+	
 	public static Semantic generateSemantic(String name, Map<String, String> paras) {
 		Semantic seman = new Semantic();
 		List<Item> semanSet = new ArrayList<Item>();

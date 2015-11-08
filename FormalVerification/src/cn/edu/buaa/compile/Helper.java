@@ -59,29 +59,20 @@ public class Helper {
 		case "bc":
 			int bo =  Integer.parseInt(paras.get("BO"));
 			if((bo & 1<<2) > 0 && 0 == (bo & 1<<3)) {
-				item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
-				semanSet.add(item);
-				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
-				semanSet.add(item);
-				item = new Item("CR[BI] = {3'b001, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
-				semanSet.add(item);
-			} else if((bo & 1<<2) > 0 && (bo & 1<<3) > 0) {
-				item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(6).getLeft(), ts.get(6).getRight());
+				item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
 				semanSet.add(item);
 				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
 				semanSet.add(item);
-				item = new Item("CR[BI] = {3'b001, XER.SO}",  ts.get(6).getLeft(), ts.get(6).getRight());
+				item = new Item("CR[BI] = {3'b001, XER.SO}", ts.get(4).getLeft(), ts.get(4).getRight());
+				semanSet.add(item);
+			} else if((bo & 1<<2) > 0 && (bo & 1<<3) > 0) {
+				item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
+				semanSet.add(item);
+				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(4).getLeft(), ts.get(4).getRight());
+				semanSet.add(item);
+				item = new Item("CR[BI] = {3'b001, XER.SO}",  ts.get(5).getLeft(), ts.get(5).getRight());
 				semanSet.add(item);
 			}			
-			break;
-		case "b":
-			int AA = Integer.parseInt(paras.get("AA"));
-			for(Item e : ts) {
-				if(e.getPremise().equals("AA = " + AA)) {
-					item = new Item(null, e.getLeft(), e.getRight());
-					semanSet.add(item);
-				}
-			}
 			break;
 		case "lwz":
 			int rA = Integer.parseInt(paras.get("rA"));
@@ -93,20 +84,6 @@ public class Helper {
 					return;
 				}
 			}
-			break;
-		case "divw":
-			item = new Item(ts.get(0).getPremise(), ts.get(0).getLeft(), ts.get(0).getRight());
-			semanSet.add(item);
-			item = new Item(ts.get(1).getPremise(), ts.get(1).getLeft(), ts.get(1).getRight());
-			semanSet.add(item);
-			break;
-		case "mullw":
-			item = new Item(ts.get(0).getPremise(), ts.get(0).getLeft(), ts.get(0).getRight());
-			semanSet.add(item);
-			break;
-		case "subf":
-			item = new Item(ts.get(0).getPremise(), ts.get(0).getLeft(), ts.get(0).getRight());
-			semanSet.add(item);
 			break;
 		default:
 			for(Item e : ts) {	

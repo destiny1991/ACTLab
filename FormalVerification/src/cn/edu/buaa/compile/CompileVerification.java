@@ -1,6 +1,7 @@
 package cn.edu.buaa.compile;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,6 +10,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
 
 /**
  * 形式验证程序
@@ -194,60 +199,55 @@ public class CompileVerification {
 	}
 	
 	public Map<String, Semantic> loadAxiom() {
-		BufferedReader reader = null;
 		Map<String, Semantic> axiom = new HashMap<String, Semantic>(); 
+		Workbook readwb = null;
+		
 		try {
-			reader = new BufferedReader(
-						new InputStreamReader(
-								new FileInputStream("src/cn/edu/buaa/resources/axiom.txt")
-								)
-						);
-			
-			String line;
-			String name = null;
-			while(null != (line = reader.readLine())) {
-				line = line.trim();
-				if(0 == line.length()) continue;
-				if(null == name) {
-					name = line;
-					List<Item> semanSet = new ArrayList<Item>();
-					Semantic seman = new Semantic(semanSet);
-					while(!name.equals(line = reader.readLine().trim())) {
-						if(0 == line.length()) continue;
-						String[] lines = line.split("\t");
-						lines = Tool.filterOtherSignal(lines);
-						Item item = null;
-						if(1 == lines.length) {
-							item = new Item(lines[0]);
-						} else if(2 == lines.length) {
-							item = new Item(lines[0], lines[1]);
-						} else if(3 == lines.length) {
-							item = new Item(lines[0], lines[1], lines[2]);
-						} else {
-							item = null;
-						}
-						if(null != item) semanSet.add(item);
-					}
-					axiom.put(name, seman);
-					name = null;
-				}
-			}
-		} catch (FileNotFoundException e) {
+			readwb = Workbook.getWorkbook(new File("src/cn/edu/buaa/resources/Axiom.xls"));
+            Sheet readsheet = readwb.getSheet(0);
+            int rsRows = readsheet.getRows();
+            int i = 1;
+            while(i < rsRows) {
+            	String name = readsheet.getCell(0, i).getContents().trim();
+            	if(null == name || name.equals("")) continue;
+            	List<Item> semanSet = new ArrayList<Item>();
+				Semantic seman = new Semantic(semanSet);
+            	while(i < rsRows) {
+            		String tmp = readsheet.getCell(0, i).getContents();
+            		if(null == tmp || tmp.equals("") || tmp.equals(name))  {
+            			String premise = readsheet.getCell(1, i).getContents().trim();
+            			String left = readsheet.getCell(2, i).getContents().trim();
+            			String right = readsheet.getCell(3, i).getContents().trim();
+            			
+            			if(null == premise || premise.equals("")) premise = null;
+            			if(null == left || left.equals("")) left = null;
+            			if(null == right || right.equals("")) right = null;
+            			
+            			if(null != premise || null != left || null != right) {
+            				Item item = new Item(premise, left, right);
+            				semanSet.add(item);
+            			}
+    	            	i++;
+            		} else {
+            			break;
+            		}
+            	}
+            	axiom.put(name, seman);
+				name = null;
+            }
+		} catch (BiffException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if(null != reader) {
-				try {
-					reader.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			if(null != readwb) {
+				readwb.close();
 			}
 		}
+		
 		return axiom;
 	}
-	
+		
 	public void runApp(String inputFile) {
 		long start = System.currentTimeMillis();
 
@@ -269,7 +269,7 @@ public class CompileVerification {
 		semanSrc = Tool.cloneSemanFromCodeSet(codeSet);
 		result = verificationProcess(semanSrc);
 		long end = System.currentTimeMillis();
-		Tool.saveResult(inputFile, result);
+		//Tool.saveResult(inputFile, result);
 
 		Tool.printCodeSemantic(codeSet);
 		System.out.println("**************************************************");
