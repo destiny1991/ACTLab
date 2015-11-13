@@ -39,7 +39,9 @@ public class CompileVerification {
 			if(null == item1.getPremise() && null == item1.getRight()) {
 				return item1;
 			} else if(null == item1.getPremise()) {
-				item1.setRight(item1.getRight().replace(item2.getLeft(), item2.getRight()));
+				if(!item2.getLeft().equals("PC")) {
+					item1.setRight(item1.getRight().replace(item2.getLeft(), item2.getRight()));
+				}
 				if(item1.getLeft().equals(item2.getLeft())) {
 					if(!item2.getLeft().equals("PC")) {
 						return null;
@@ -50,7 +52,9 @@ public class CompileVerification {
 					return item1;
 				}
 			} else {
-				item1.setRight(item1.getRight().replace(item2.getLeft(), item2.getRight()));
+				if(!item2.getLeft().equals("PC")) {
+					item1.setRight(item1.getRight().replace(item2.getLeft(), item2.getRight()));
+				}
 				String str = item2.getLeft() + " = " + item2.getRight();
 				if(item1.getPremise().equals(str)) {
 					item1.setPremise(null);
@@ -249,12 +253,12 @@ public class CompileVerification {
 	}
 		
 	public void runApp(String inputFile) {
-		long start = System.currentTimeMillis();
-
 		/**
 		 * 载入程序所需的公理
 		 */
 		axiomSet = loadAxiom();
+		
+		long start = System.currentTimeMillis();
 		
 		/**
 		 * 把输入的汇编代码翻译成对应的指称语义形式
@@ -269,17 +273,17 @@ public class CompileVerification {
 		semanSrc = Tool.cloneSemanFromCodeSet(codeSet);
 		result = verificationProcess(semanSrc);
 		long end = System.currentTimeMillis();
-		//Tool.saveResult(inputFile, result);
+//		Tool.saveResult(inputFile, result);
 
 		Tool.printCodeSemantic(codeSet);
 		System.out.println("**************************************************");
 		Tool.printSemanticList(result);
-		System.out.println("\n加载和推导耗时：" + (end - start) + " ms");
+		System.out.println("\n计算和推导耗时：" + (end - start) + " ms");
 	}
-		
+
 	public static void main(String[] args) {
 		CompileVerification cv = new CompileVerification();
-		String inputPath = "src/input/while.txt";
+		String inputPath = "src/input/switch.txt";
 		cv.runApp(inputPath);
 	}
 }

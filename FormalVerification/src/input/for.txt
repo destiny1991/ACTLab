@@ -1,9 +1,9 @@
-<EXP_1>
-b	Address_2
+<ASS-EXP_1>
+b	@Address_2
 Address_1:
 <STA-LIST>
-<EXP_3>
+<ASS-EXP_2>
 Address_2:    
-<EXP_2>
+<LOG-EXP>
 cmpi	7, 0, 0, 0
-bc	12, 7, Address_1
+bc	12, 29, @Address_1

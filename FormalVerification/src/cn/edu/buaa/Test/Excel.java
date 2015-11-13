@@ -7,7 +7,7 @@ import jxl.Sheet;
 import jxl.Workbook;   
 import jxl.read.biff.BiffException;
 
-public class Try {
+public class Excel {
 	public static void main(String[] args) {
 		Workbook readwb = null;
 		

@@ -22,7 +22,8 @@ public class Helper {
 			break;
 		case "bc":
 			paras.put("BO", lines[1]);
-			paras.put("BI", lines[2]);
+			int BI = ((Integer.parseInt(lines[2]))>>2) & 7;
+			paras.put("BI", BI + "");
 			paras.put("BD", lines[3]);
 			paras.put("AA", "0");
 			paras.put("LK", "0");
@@ -64,15 +65,41 @@ public class Helper {
 				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
 				semanSet.add(item);
 				item = new Item("CR[BI] = {3'b001, XER.SO}", ts.get(4).getLeft(), ts.get(4).getRight());
+				item.setRight("PC + BD");
 				semanSet.add(item);
 			} else if((bo & 1<<2) > 0 && (bo & 1<<3) > 0) {
 				item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
 				semanSet.add(item);
 				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(4).getLeft(), ts.get(4).getRight());
+				item.setRight("PC + BD");
 				semanSet.add(item);
 				item = new Item("CR[BI] = {3'b001, XER.SO}",  ts.get(5).getLeft(), ts.get(5).getRight());
 				semanSet.add(item);
 			}			
+			break;
+		case "cmpi":
+			String simm = paras.get("SIMM");
+			for(Item e : ts) {	
+				try {
+					item = (Item) e.clone();
+					if(simm.equals("0")) {
+						String tmp = item.getPremise().replace("{16{SIMM[16]}, SIMM}", "32{SIMM}");
+						item.setPremise(tmp);
+					}
+					semanSet.add(item);
+				} catch (CloneNotSupportedException e1) {
+					e1.printStackTrace();
+				}
+			}
+			break;
+		case "b":
+			try {
+				item = (Item) ts.get(0).clone();
+				item.setRight("PC + LI");
+				semanSet.add(item);
+			} catch (CloneNotSupportedException e2) {
+				e2.printStackTrace();
+			}
 			break;
 		case "lwz":
 			int rA = Integer.parseInt(paras.get("rA"));
