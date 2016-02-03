@@ -29,8 +29,6 @@ public class Token {
 		this(type_index, value + "");
 	}
 	
-	
-
 	public String getType() {
 		return type;
 	}
