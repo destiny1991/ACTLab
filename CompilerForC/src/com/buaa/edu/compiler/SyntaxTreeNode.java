@@ -1,5 +1,7 @@
 package com.buaa.edu.compiler;
 
+import java.util.Map;
+
 /**
  * 语法树节点
  * @author destiny
@@ -11,7 +13,7 @@ public class SyntaxTreeNode {
 	// 记录某些token的类型
 	private String type;
 	// 语义分析中记录关于token的其他一些信息，比如关键字是变量，该变量类型为int
-	private String extraInfo;
+	private Map<String, String> extraInfo;
 	
 	private SyntaxTreeNode father;
 	private SyntaxTreeNode left;
@@ -22,7 +24,7 @@ public class SyntaxTreeNode {
 		this(value, null, null);
 	}
 
-	public SyntaxTreeNode(String value, String type, String extraInfo) {
+	public SyntaxTreeNode(String value, String type, Map<String, String> extraInfo) {
 		super();
 		this.value = value;
 		this.type = type;
@@ -45,11 +47,11 @@ public class SyntaxTreeNode {
 		this.type = type;
 	}
 
-	public String getExtraInfo() {
+	public Map<String, String> getExtraInfo() {
 		return extraInfo;
 	}
 
-	public void setExtraInfo(String extraInfo) {
+	public void setExtraInfo(Map<String, String> extraInfo) {
 		this.extraInfo = extraInfo;
 	}
 
