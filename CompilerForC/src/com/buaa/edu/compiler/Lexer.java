@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -173,8 +174,7 @@ public class Lexer {
 		}
 	}
 	
-	public static void main(String[] args) throws Exception {
-		String src = "src/input/source.c";
+	public static String getContent(String src) throws Exception {
 		BufferedReader reader = new BufferedReader(new FileReader(src));
 		String line = null;
 		StringBuffer sb = new StringBuffer();
@@ -182,16 +182,23 @@ public class Lexer {
 			sb.append(line).append("\n");
 		}
 		reader.close();
-		
-		Lexer lexer = new Lexer(sb.toString());
-		lexer.runLexer();
-		List<Token> tokens = lexer.getTokens();
-		
+		return sb.toString();
+	}
+	
+	public static void outputLexer(List<Token> tokens) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter("src/output/lexer.txt"));
 		for(Token e : tokens) {
 			writer.write("(" + e.getType() + ", " + e.getValue() + ")\n");
 			System.out.println("(" + e.getType() + ", " + e.getValue() + ")");
 		}
 		writer.close();
+	}
+	
+	public static void main(String[] args) throws Exception {
+		String src = "src/input/source.c";
+		Lexer lexer = new Lexer(getContent(src));
+		lexer.runLexer();
+		List<Token> tokens = lexer.getTokens();
+		outputLexer(tokens);
 	}
 }
