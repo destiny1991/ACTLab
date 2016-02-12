@@ -1,175 +1,175 @@
-( self: Sentence null, father: null, left: null, right: null
-( self: Include null, father: Sentence, left: null, right: FunctionStatement
-( self: # null, father: Include, left: null, right: include
-( self: include null, father: Include, left: #, right: <
-( self: < null, father: Include, left: include, right: stdio.h
-( self: stdio.h null, father: Include, left: <, right: >
-( self: > null, father: Include, left: stdio.h, right: null
-( self: FunctionStatement null, father: Sentence, left: Include, right: null
-( self: Type null, father: FunctionStatement, left: null, right: FunctionName
-( self: int FIELD_TYPE, father: Type, left: null, right: null
-( self: FunctionName null, father: FunctionStatement, left: Type, right: StateParameterList
-( self: main IDENTIFIER, father: FunctionName, left: null, right: null
-( self: StateParameterList null, father: FunctionStatement, left: FunctionName, right: Sentence
-( self: Sentence null, father: FunctionStatement, left: StateParameterList, right: null
-( self: Statement null, father: Sentence, left: null, right: Statement
-( self: Type null, father: Statement, left: null, right: score
-( self: int FIELD_TYPE, father: Type, left: null, right: null
-( self: score IDENTIFIER, father: Statement, left: Type, right: 6
-( self: 6 DIGIT_CONSTANT, father: Statement, left: score, right: ConstantList
-( self: ConstantList null, father: Statement, left: 6, right: null
-( self: 76 DIGIT_CONSTANT, father: ConstantList, left: null, right: 82
-( self: 82 DIGIT_CONSTANT, father: ConstantList, left: 76, right: 90
-( self: 90 DIGIT_CONSTANT, father: ConstantList, left: 82, right: 86
-( self: 86 DIGIT_CONSTANT, father: ConstantList, left: 90, right: 79
-( self: 79 DIGIT_CONSTANT, father: ConstantList, left: 86, right: 62
-( self: 62 DIGIT_CONSTANT, father: ConstantList, left: 79, right: null
-( self: Statement null, father: Sentence, left: Statement, right: Statement
-( self: Type null, father: Statement, left: null, right: credit
-( self: int FIELD_TYPE, father: Type, left: null, right: null
-( self: credit IDENTIFIER, father: Statement, left: Type, right: 6
-( self: 6 DIGIT_CONSTANT, father: Statement, left: credit, right: ConstantList
-( self: ConstantList null, father: Statement, left: 6, right: null
-( self: 2 DIGIT_CONSTANT, father: ConstantList, left: null, right: 2
-( self: 2 DIGIT_CONSTANT, father: ConstantList, left: 2, right: 1
-( self: 1 DIGIT_CONSTANT, father: ConstantList, left: 2, right: 2
-( self: 2 DIGIT_CONSTANT, father: ConstantList, left: 1, right: 2
-( self: 2 DIGIT_CONSTANT, father: ConstantList, left: 2, right: 3
-( self: 3 DIGIT_CONSTANT, father: ConstantList, left: 2, right: null
-( self: Statement null, father: Sentence, left: Statement, right: Statement
-( self: Type null, father: Statement, left: null, right: stu_number
-( self: int FIELD_TYPE, father: Type, left: null, right: null
-( self: stu_number IDENTIFIER, father: Statement, left: Type, right: null
-( self: Statement null, father: Sentence, left: Statement, right: Statement
-( self: Type null, father: Statement, left: null, right: mean
-( self: float FIELD_TYPE, father: Type, left: null, right: null
-( self: mean IDENTIFIER, father: Statement, left: Type, right: null
-( self: Statement null, father: Sentence, left: Statement, right: Statement
-( self: Type null, father: Statement, left: null, right: sum
-( self: float FIELD_TYPE, father: Type, left: null, right: null
-( self: sum IDENTIFIER, father: Statement, left: Type, right: null
-( self: Statement null, father: Sentence, left: Statement, right: Statement
-( self: Type null, father: Statement, left: null, right: temp
-( self: int FIELD_TYPE, father: Type, left: null, right: null
-( self: temp IDENTIFIER, father: Statement, left: Type, right: null
-( self: Statement null, father: Sentence, left: Statement, right: FunctionCall
-( self: Type null, father: Statement, left: null, right: i
-( self: int FIELD_TYPE, father: Type, left: null, right: null
-( self: i IDENTIFIER, father: Statement, left: Type, right: null
-( self: FunctionCall null, father: Sentence, left: Statement, right: FunctionCall
-( self: printf FUNCTION_NAME, father: FunctionCall, left: null, right: CallParameterList
-( self: CallParameterList null, father: FunctionCall, left: printf, right: null
-( self: please input your student number: STRING_CONSTANT, father: CallParameterList, left: null, right: null
-( self: FunctionCall null, father: Sentence, left: FunctionCall, right: Assignment
-( self: scanf FUNCTION_NAME, father: FunctionCall, left: null, right: CallParameterList
-( self: CallParameterList null, father: FunctionCall, left: scanf, right: null
-( self: %d STRING_CONSTANT, father: CallParameterList, left: null, right: &
-( self: & ADDRESS, father: CallParameterList, left: %d, right: stu_number
-( self: stu_number IDENTIFIER, father: CallParameterList, left: &, right: null
-( self: Assignment null, father: Sentence, left: FunctionCall, right: Assignment
-( self: sum IDENTIFIER, father: Assignment, left: null, right: Expression
-( self: Expression Constant, father: Assignment, left: sum, right: null
-( self: 0 _Constant, father: Expression, left: null, right: null
-( self: Assignment null, father: Sentence, left: Assignment, right: Control
-( self: temp IDENTIFIER, father: Assignment, left: null, right: Expression
-( self: Expression Constant, father: Assignment, left: temp, right: null
-( self: 0 _Constant, father: Expression, left: null, right: null
-( self: Control ForControl, father: Sentence, left: Assignment, right: Assignment
-( self: Assignment null, father: Control, left: null, right: Expression
-( self: i IDENTIFIER, father: Assignment, left: null, right: Expression
-( self: Expression Constant, father: Assignment, left: i, right: null
-( self: 0 _Constant, father: Expression, left: null, right: null
-( self: Expression DoubleOperand, father: Control, left: Assignment, right: Sentence
-( self: Expression Variable, father: Expression, left: null, right: Operator
-( self: i _Variable, father: Expression, left: null, right: null
-( self: Operator Operator, father: Expression, left: Expression, right: Expression
-( self: < _Operator, father: Operator, left: null, right: null
-( self: Expression Constant, father: Expression, left: Operator, right: null
-( self: 6 _Constant, father: Expression, left: null, right: null
-( self: Sentence null, father: Control, left: Expression, right: Expression
-( self: Assignment null, father: Sentence, left: null, right: Assignment
-( self: sum IDENTIFIER, father: Assignment, left: null, right: Expression
-( self: Expression DoubleOperand, father: Assignment, left: sum, right: null
-( self: Expression Variable, father: Expression, left: null, right: Operator
-( self: sum _Variable, father: Expression, left: null, right: null
-( self: Operator Operator, father: Expression, left: Expression, right: Expression
-( self: + _Operator, father: Operator, left: null, right: null
-( self: Expression DoubleOperand, father: Expression, left: Operator, right: null
-( self: Expression ArrayItem, father: Expression, left: null, right: Operator
-( self: score _ArrayName, father: Expression, left: null, right: i
-( self: i _ArrayIndex, father: Expression, left: score, right: null
-( self: Operator Operator, father: Expression, left: Expression, right: Expression
-( self: * _Operator, father: Operator, left: null, right: null
-( self: Expression ArrayItem, father: Expression, left: Operator, right: null
-( self: credit _ArrayName, father: Expression, left: null, right: i
-( self: i _ArrayIndex, father: Expression, left: credit, right: null
-( self: Assignment null, father: Sentence, left: Assignment, right: null
-( self: temp IDENTIFIER, father: Assignment, left: null, right: Expression
-( self: Expression DoubleOperand, father: Assignment, left: temp, right: null
-( self: Expression Variable, father: Expression, left: null, right: Operator
-( self: temp _Variable, father: Expression, left: null, right: null
-( self: Operator Operator, father: Expression, left: Expression, right: Expression
-( self: + _Operator, father: Operator, left: null, right: null
-( self: Expression ArrayItem, father: Expression, left: Operator, right: null
-( self: credit _ArrayName, father: Expression, left: null, right: i
-( self: i _ArrayIndex, father: Expression, left: credit, right: null
-( self: Expression SingleOperand, father: Control, left: Sentence, right: null
-( self: Operator Operator, father: Expression, left: null, right: Expression
-( self: ++ _Operator, father: Operator, left: null, right: null
-( self: Expression Variable, father: Expression, left: Operator, right: null
-( self: i _Variable, father: Expression, left: null, right: null
-( self: Assignment null, father: Sentence, left: Control, right: Control
-( self: mean IDENTIFIER, father: Assignment, left: null, right: Expression
-( self: Expression DoubleOperand, father: Assignment, left: mean, right: null
-( self: Expression Variable, father: Expression, left: null, right: Operator
-( self: sum _Variable, father: Expression, left: null, right: null
-( self: Operator Operator, father: Expression, left: Expression, right: Expression
-( self: / _Operator, father: Operator, left: null, right: null
-( self: Expression Variable, father: Expression, left: Operator, right: null
-( self: temp _Variable, father: Expression, left: null, right: null
-( self: Control IfElseControl, father: Sentence, left: Assignment, right: Return
-( self: IfControl null, father: Control, left: null, right: ElseControl
-( self: Expression DoubleOperand, father: IfControl, left: null, right: Sentence
-( self: Expression Variable, father: Expression, left: null, right: Operator
-( self: mean _Variable, father: Expression, left: null, right: null
-( self: Operator Operator, father: Expression, left: Expression, right: Expression
-( self: >= _Operator, father: Operator, left: null, right: null
-( self: Expression Constant, father: Expression, left: Operator, right: null
-( self: 60 _Constant, father: Expression, left: null, right: null
-( self: Sentence null, father: IfControl, left: Expression, right: null
-( self: Assignment null, father: Sentence, left: null, right: FunctionCall
-( self: mean IDENTIFIER, father: Assignment, left: null, right: Expression
-( self: Expression DoubleOperand, father: Assignment, left: mean, right: null
-( self: Expression Variable, father: Expression, left: null, right: Operator
-( self: mean _Variable, father: Expression, left: null, right: null
-( self: Operator Operator, father: Expression, left: Expression, right: Expression
-( self: - _Operator, father: Operator, left: null, right: null
-( self: Expression Constant, father: Expression, left: Operator, right: null
-( self: 60 _Constant, father: Expression, left: null, right: null
-( self: FunctionCall null, father: Sentence, left: Assignment, right: null
-( self: printf FUNCTION_NAME, father: FunctionCall, left: null, right: CallParameterList
-( self: CallParameterList null, father: FunctionCall, left: printf, right: null
-( self: the score of student number %d is %f higher than 60.\n STRING_CONSTANT, father: CallParameterList, left: null, right: stu_number
-( self: stu_number IDENTIFIER, father: CallParameterList, left: the score of student number %d is %f higher than 60.\n, right: mean
-( self: mean IDENTIFIER, father: CallParameterList, left: stu_number, right: null
-( self: ElseControl null, father: Control, left: IfControl, right: null
-( self: Sentence null, father: ElseControl, left: null, right: null
-( self: Assignment null, father: Sentence, left: null, right: FunctionCall
-( self: mean IDENTIFIER, father: Assignment, left: null, right: Expression
-( self: Expression DoubleOperand, father: Assignment, left: mean, right: null
-( self: Expression Constant, father: Expression, left: null, right: Operator
-( self: 60 _Constant, father: Expression, left: null, right: null
-( self: Operator Operator, father: Expression, left: Expression, right: Expression
-( self: - _Operator, father: Operator, left: null, right: null
-( self: Expression Variable, father: Expression, left: Operator, right: null
-( self: mean _Variable, father: Expression, left: null, right: null
-( self: FunctionCall null, father: Sentence, left: Assignment, right: null
-( self: printf FUNCTION_NAME, father: FunctionCall, left: null, right: CallParameterList
-( self: CallParameterList null, father: FunctionCall, left: printf, right: null
-( self: the score of student number %d is %f lower than 60.\n STRING_CONSTANT, father: CallParameterList, left: null, right: stu_number
-( self: stu_number IDENTIFIER, father: CallParameterList, left: the score of student number %d is %f lower than 60.\n, right: mean
-( self: mean IDENTIFIER, father: CallParameterList, left: stu_number, right: null
-( self: Return null, father: Sentence, left: Control, right: null
-( self: return null, father: Return, left: null, right: Expression
-( self: Expression Constant, father: Return, left: return, right: null
-( self: 0 _Constant, father: Expression, left: null, right: null
+( self: Sentence null, father: null, left: null, right: null )
+( self: Include null, father: Sentence, left: null, right: FunctionStatement )
+( self: # null, father: Include, left: null, right: include )
+( self: include null, father: Include, left: #, right: < )
+( self: < null, father: Include, left: include, right: stdio.h )
+( self: stdio.h null, father: Include, left: <, right: > )
+( self: > null, father: Include, left: stdio.h, right: null )
+( self: FunctionStatement null, father: Sentence, left: Include, right: null )
+( self: Type null, father: FunctionStatement, left: null, right: FunctionName )
+( self: int FIELD_TYPE, father: Type, left: null, right: null )
+( self: FunctionName null, father: FunctionStatement, left: Type, right: StateParameterList )
+( self: main IDENTIFIER, father: FunctionName, left: null, right: null )
+( self: StateParameterList null, father: FunctionStatement, left: FunctionName, right: Sentence )
+( self: Sentence null, father: FunctionStatement, left: StateParameterList, right: null )
+( self: Statement null, father: Sentence, left: null, right: Statement )
+( self: Type null, father: Statement, left: null, right: score )
+( self: int FIELD_TYPE, father: Type, left: null, right: null )
+( self: score IDENTIFIER, father: Statement, left: Type, right: 6 )
+( self: 6 DIGIT_CONSTANT, father: Statement, left: score, right: ConstantList )
+( self: ConstantList null, father: Statement, left: 6, right: null )
+( self: 76 DIGIT_CONSTANT, father: ConstantList, left: null, right: 82 )
+( self: 82 DIGIT_CONSTANT, father: ConstantList, left: 76, right: 90 )
+( self: 90 DIGIT_CONSTANT, father: ConstantList, left: 82, right: 86 )
+( self: 86 DIGIT_CONSTANT, father: ConstantList, left: 90, right: 79 )
+( self: 79 DIGIT_CONSTANT, father: ConstantList, left: 86, right: 62 )
+( self: 62 DIGIT_CONSTANT, father: ConstantList, left: 79, right: null )
+( self: Statement null, father: Sentence, left: Statement, right: Statement )
+( self: Type null, father: Statement, left: null, right: credit )
+( self: int FIELD_TYPE, father: Type, left: null, right: null )
+( self: credit IDENTIFIER, father: Statement, left: Type, right: 6 )
+( self: 6 DIGIT_CONSTANT, father: Statement, left: credit, right: ConstantList )
+( self: ConstantList null, father: Statement, left: 6, right: null )
+( self: 2 DIGIT_CONSTANT, father: ConstantList, left: null, right: 2 )
+( self: 2 DIGIT_CONSTANT, father: ConstantList, left: 2, right: 1 )
+( self: 1 DIGIT_CONSTANT, father: ConstantList, left: 2, right: 2 )
+( self: 2 DIGIT_CONSTANT, father: ConstantList, left: 1, right: 2 )
+( self: 2 DIGIT_CONSTANT, father: ConstantList, left: 2, right: 3 )
+( self: 3 DIGIT_CONSTANT, father: ConstantList, left: 2, right: null )
+( self: Statement null, father: Sentence, left: Statement, right: Statement )
+( self: Type null, father: Statement, left: null, right: stu_number )
+( self: int FIELD_TYPE, father: Type, left: null, right: null )
+( self: stu_number IDENTIFIER, father: Statement, left: Type, right: null )
+( self: Statement null, father: Sentence, left: Statement, right: Statement )
+( self: Type null, father: Statement, left: null, right: mean )
+( self: float FIELD_TYPE, father: Type, left: null, right: null )
+( self: mean IDENTIFIER, father: Statement, left: Type, right: null )
+( self: Statement null, father: Sentence, left: Statement, right: Statement )
+( self: Type null, father: Statement, left: null, right: sum )
+( self: float FIELD_TYPE, father: Type, left: null, right: null )
+( self: sum IDENTIFIER, father: Statement, left: Type, right: null )
+( self: Statement null, father: Sentence, left: Statement, right: Statement )
+( self: Type null, father: Statement, left: null, right: temp )
+( self: int FIELD_TYPE, father: Type, left: null, right: null )
+( self: temp IDENTIFIER, father: Statement, left: Type, right: null )
+( self: Statement null, father: Sentence, left: Statement, right: FunctionCall )
+( self: Type null, father: Statement, left: null, right: i )
+( self: int FIELD_TYPE, father: Type, left: null, right: null )
+( self: i IDENTIFIER, father: Statement, left: Type, right: null )
+( self: FunctionCall null, father: Sentence, left: Statement, right: FunctionCall )
+( self: printf FUNCTION_NAME, father: FunctionCall, left: null, right: CallParameterList )
+( self: CallParameterList null, father: FunctionCall, left: printf, right: null )
+( self: please input your student number: STRING_CONSTANT, father: CallParameterList, left: null, right: null )
+( self: FunctionCall null, father: Sentence, left: FunctionCall, right: Assignment )
+( self: scanf FUNCTION_NAME, father: FunctionCall, left: null, right: CallParameterList )
+( self: CallParameterList null, father: FunctionCall, left: scanf, right: null )
+( self: %d STRING_CONSTANT, father: CallParameterList, left: null, right: & )
+( self: & ADDRESS, father: CallParameterList, left: %d, right: stu_number )
+( self: stu_number IDENTIFIER, father: CallParameterList, left: &, right: null )
+( self: Assignment null, father: Sentence, left: FunctionCall, right: Assignment )
+( self: sum IDENTIFIER, father: Assignment, left: null, right: Expression )
+( self: Expression Constant, father: Assignment, left: sum, right: null )
+( self: 0 _Constant, father: Expression, left: null, right: null )
+( self: Assignment null, father: Sentence, left: Assignment, right: Control )
+( self: temp IDENTIFIER, father: Assignment, left: null, right: Expression )
+( self: Expression Constant, father: Assignment, left: temp, right: null )
+( self: 0 _Constant, father: Expression, left: null, right: null )
+( self: Control ForControl, father: Sentence, left: Assignment, right: Assignment )
+( self: Assignment null, father: Control, left: null, right: Expression )
+( self: i IDENTIFIER, father: Assignment, left: null, right: Expression )
+( self: Expression Constant, father: Assignment, left: i, right: null )
+( self: 0 _Constant, father: Expression, left: null, right: null )
+( self: Expression DoubleOperand, father: Control, left: Assignment, right: Sentence )
+( self: Expression Variable, father: Expression, left: null, right: Operator )
+( self: i _Variable, father: Expression, left: null, right: null )
+( self: Operator Operator, father: Expression, left: Expression, right: Expression )
+( self: < _Operator, father: Operator, left: null, right: null )
+( self: Expression Constant, father: Expression, left: Operator, right: null )
+( self: 6 _Constant, father: Expression, left: null, right: null )
+( self: Sentence null, father: Control, left: Expression, right: Expression )
+( self: Assignment null, father: Sentence, left: null, right: Assignment )
+( self: sum IDENTIFIER, father: Assignment, left: null, right: Expression )
+( self: Expression DoubleOperand, father: Assignment, left: sum, right: null )
+( self: Expression Variable, father: Expression, left: null, right: Operator )
+( self: sum _Variable, father: Expression, left: null, right: null )
+( self: Operator Operator, father: Expression, left: Expression, right: Expression )
+( self: + _Operator, father: Operator, left: null, right: null )
+( self: Expression DoubleOperand, father: Expression, left: Operator, right: null )
+( self: Expression ArrayItem, father: Expression, left: null, right: Operator )
+( self: score _ArrayName, father: Expression, left: null, right: i )
+( self: i _ArrayIndex, father: Expression, left: score, right: null )
+( self: Operator Operator, father: Expression, left: Expression, right: Expression )
+( self: * _Operator, father: Operator, left: null, right: null )
+( self: Expression ArrayItem, father: Expression, left: Operator, right: null )
+( self: credit _ArrayName, father: Expression, left: null, right: i )
+( self: i _ArrayIndex, father: Expression, left: credit, right: null )
+( self: Assignment null, father: Sentence, left: Assignment, right: null )
+( self: temp IDENTIFIER, father: Assignment, left: null, right: Expression )
+( self: Expression DoubleOperand, father: Assignment, left: temp, right: null )
+( self: Expression Variable, father: Expression, left: null, right: Operator )
+( self: temp _Variable, father: Expression, left: null, right: null )
+( self: Operator Operator, father: Expression, left: Expression, right: Expression )
+( self: + _Operator, father: Operator, left: null, right: null )
+( self: Expression ArrayItem, father: Expression, left: Operator, right: null )
+( self: credit _ArrayName, father: Expression, left: null, right: i )
+( self: i _ArrayIndex, father: Expression, left: credit, right: null )
+( self: Expression SingleOperand, father: Control, left: Sentence, right: null )
+( self: Operator Operator, father: Expression, left: null, right: Expression )
+( self: ++ _Operator, father: Operator, left: null, right: null )
+( self: Expression Variable, father: Expression, left: Operator, right: null )
+( self: i _Variable, father: Expression, left: null, right: null )
+( self: Assignment null, father: Sentence, left: Control, right: Control )
+( self: mean IDENTIFIER, father: Assignment, left: null, right: Expression )
+( self: Expression DoubleOperand, father: Assignment, left: mean, right: null )
+( self: Expression Variable, father: Expression, left: null, right: Operator )
+( self: sum _Variable, father: Expression, left: null, right: null )
+( self: Operator Operator, father: Expression, left: Expression, right: Expression )
+( self: / _Operator, father: Operator, left: null, right: null )
+( self: Expression Variable, father: Expression, left: Operator, right: null )
+( self: temp _Variable, father: Expression, left: null, right: null )
+( self: Control IfElseControl, father: Sentence, left: Assignment, right: Return )
+( self: IfControl null, father: Control, left: null, right: ElseControl )
+( self: Expression DoubleOperand, father: IfControl, left: null, right: Sentence )
+( self: Expression Variable, father: Expression, left: null, right: Operator )
+( self: mean _Variable, father: Expression, left: null, right: null )
+( self: Operator Operator, father: Expression, left: Expression, right: Expression )
+( self: >= _Operator, father: Operator, left: null, right: null )
+( self: Expression Constant, father: Expression, left: Operator, right: null )
+( self: 60 _Constant, father: Expression, left: null, right: null )
+( self: Sentence null, father: IfControl, left: Expression, right: null )
+( self: Assignment null, father: Sentence, left: null, right: FunctionCall )
+( self: mean IDENTIFIER, father: Assignment, left: null, right: Expression )
+( self: Expression DoubleOperand, father: Assignment, left: mean, right: null )
+( self: Expression Variable, father: Expression, left: null, right: Operator )
+( self: mean _Variable, father: Expression, left: null, right: null )
+( self: Operator Operator, father: Expression, left: Expression, right: Expression )
+( self: - _Operator, father: Operator, left: null, right: null )
+( self: Expression Constant, father: Expression, left: Operator, right: null )
+( self: 60 _Constant, father: Expression, left: null, right: null )
+( self: FunctionCall null, father: Sentence, left: Assignment, right: null )
+( self: printf FUNCTION_NAME, father: FunctionCall, left: null, right: CallParameterList )
+( self: CallParameterList null, father: FunctionCall, left: printf, right: null )
+( self: the score of student number %d is %f higher than 60.\n STRING_CONSTANT, father: CallParameterList, left: null, right: stu_number )
+( self: stu_number IDENTIFIER, father: CallParameterList, left: the score of student number %d is %f higher than 60.\n, right: mean )
+( self: mean IDENTIFIER, father: CallParameterList, left: stu_number, right: null )
+( self: ElseControl null, father: Control, left: IfControl, right: null )
+( self: Sentence null, father: ElseControl, left: null, right: null )
+( self: Assignment null, father: Sentence, left: null, right: FunctionCall )
+( self: mean IDENTIFIER, father: Assignment, left: null, right: Expression )
+( self: Expression DoubleOperand, father: Assignment, left: mean, right: null )
+( self: Expression Constant, father: Expression, left: null, right: Operator )
+( self: 60 _Constant, father: Expression, left: null, right: null )
+( self: Operator Operator, father: Expression, left: Expression, right: Expression )
+( self: - _Operator, father: Operator, left: null, right: null )
+( self: Expression Variable, father: Expression, left: Operator, right: null )
+( self: mean _Variable, father: Expression, left: null, right: null )
+( self: FunctionCall null, father: Sentence, left: Assignment, right: null )
+( self: printf FUNCTION_NAME, father: FunctionCall, left: null, right: CallParameterList )
+( self: CallParameterList null, father: FunctionCall, left: printf, right: null )
+( self: the score of student number %d is %f lower than 60.\n STRING_CONSTANT, father: CallParameterList, left: null, right: stu_number )
+( self: stu_number IDENTIFIER, father: CallParameterList, left: the score of student number %d is %f lower than 60.\n, right: mean )
+( self: mean IDENTIFIER, father: CallParameterList, left: stu_number, right: null )
+( self: Return null, father: Sentence, left: Control, right: null )
+( self: return null, father: Return, left: null, right: Expression )
+( self: Expression Constant, father: Return, left: return, right: null )
+( self: 0 _Constant, father: Expression, left: null, right: null )

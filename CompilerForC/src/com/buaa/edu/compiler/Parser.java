@@ -53,7 +53,8 @@ public class Parser {
 	// 判断是否是控制关键字
 	private boolean isControl(String word) {
 		for(String str : CDefine.keywords[1]) {
-			if(str.equals(word)) return true;
+			if(str.equals(word)) 
+				return true;
 		}
 		return false;
 	}
@@ -61,7 +62,8 @@ public class Parser {
 	// 判断是否是数据类型
 	private boolean isDataType(String word) {
 		for(String str : CDefine.keywords[0]) {
-			if(str.equals(word)) return true;
+			if(str.equals(word)) 
+				return true;
 		}
 		return false;
 	}
@@ -85,9 +87,8 @@ public class Parser {
 		return false;
 	}
 	
-	
 	// include句型
-	private void include(SyntaxTreeNode father) {
+	private void _include(SyntaxTreeNode father) {
 		if(null == father) father = tree.getRoot();
 		
 		SyntaxTree includeTree = new SyntaxTree();
@@ -100,7 +101,9 @@ public class Parser {
 		// include语句是否结束
 		boolean flag = true;
 		while(flag) {
-			if(tokens.get(index).getValue().equals("\"")) cnt++;
+			if(tokens.get(index).getValue().equals("\"")) {
+				cnt++;
+			}
 			if(index >= tokens.size() || cnt >= 2 
 					|| tokens.get(index).getValue().equals(">")) {
 				flag = false;
@@ -112,7 +115,7 @@ public class Parser {
 	}
 	
 	// 声明语句
-	private void statement(SyntaxTreeNode father) {
+	private void _statement(SyntaxTreeNode father) {
 		if(null == father) father = tree.getRoot();
 		
 		SyntaxTree statementTree = new SyntaxTree();
@@ -195,6 +198,7 @@ public class Parser {
 										"FIELD_TYPE", 
 										extraInfo), 
 								null);
+						// 变量名
 						extraInfo = new HashMap<>();
 						extraInfo.put("type", "VARIABLE");
 						extraInfo.put("variable_type", tmpVariableType);
@@ -215,7 +219,7 @@ public class Parser {
 	}
 	
 	// 表达式
-	private void expression(SyntaxTreeNode father, Integer ind) throws Exception {
+	private void _expression(SyntaxTreeNode father, Integer ind) throws Exception {
 		if(null == father) father = tree.getRoot();
 		
 		// 运算符优先级
@@ -363,7 +367,7 @@ public class Parser {
 	}
 	
 	// 赋值语句
-	private void assignment(SyntaxTreeNode father) throws Exception {
+	private void _assignment(SyntaxTreeNode father) throws Exception {
 		if(null == father) father = tree.getRoot();
 		
 		SyntaxTree assignTree = new SyntaxTree();
@@ -383,7 +387,7 @@ public class Parser {
 				index++;
 			} else if(tokens.get(index).getType().equals("ASSIGN")) {
 				index++;
-				expression(assignTree.getRoot(), null);
+				_expression(assignTree.getRoot(), null);
 			}
 		}
 		index++;
@@ -405,7 +409,7 @@ public class Parser {
 						new SyntaxTreeNode(tokens.get(index).getValue()), null);
 				index++;
 			} else {
-				expression(returnTree.getRoot(), null);
+				_expression(returnTree.getRoot(), null);
 			}
 		}
 		index++;
@@ -425,10 +429,10 @@ public class Parser {
 			while(!tokens.get(tmpIndex).getType().equals("RL_BRACKET")) {
 				tmpIndex++;
 			}
-			expression(whileTree.getRoot(), tmpIndex);
+			_expression(whileTree.getRoot(), tmpIndex);
 			
 			if(tokens.get(tmpIndex).getType().equals("LB_BRACKET")) {
-				block(whileTree);
+				_block(whileTree);
 			}
 		}
 	}
@@ -457,7 +461,7 @@ public class Parser {
 				while(!tokens.get(tmpIndex).getType().equals("RL_BRACKET")) {
 					tmpIndex++;
 				}
-				expression(ifTree.getRoot(), tmpIndex);
+				_expression(ifTree.getRoot(), tmpIndex);
 				index++;
 			} else {
 				throw new Exception("error: lack of left bracket!");
@@ -465,7 +469,7 @@ public class Parser {
 			
 			// 左大括号
 			if(tokens.get(index).getType().equals("LB_BRACKET")) {
-				block(ifTree);
+				_block(ifTree);
 			}
 		}
 		
@@ -478,7 +482,7 @@ public class Parser {
 			 ifElseTree.addChildNode(elseTree.getRoot(), ifElseTree.getRoot());
 			 // 左大括号
 			 if(tokens.get(index).getType().equals("LB_BRACKET")) {
-				 block(elseTree);
+				 _block(elseTree);
 			 }	 
 		}
 	}
@@ -488,6 +492,7 @@ public class Parser {
 		SyntaxTree forTree = new SyntaxTree();
 		forTree.setRoot(
 				new SyntaxTreeNode("Control", "ForControl", null));
+		forTree.setCurrent(forTree.getRoot());
 		tree.addChildNode(forTree.getRoot(), father);
 		
 		// 标记for语句是否结束
@@ -504,16 +509,16 @@ public class Parser {
 					tmpIndex++;
 				}
 				// for语句中的第一个分号前的部分
-				assignment(forTree.getRoot());
+				_assignment(forTree.getRoot());
 				// 两个分号中间的部分
-				expression(forTree.getRoot(), null);
+				_expression(forTree.getRoot(), null);
 				index++;
 				// 第二个分号后的部分
-				expression(forTree.getRoot(), tmpIndex);
+				_expression(forTree.getRoot(), tmpIndex);
 				index++;
 			// 如果为左大括号
 			} else if(tokenType.equals("LB_BRACKET")) {
-				block(forTree);
+				_block(forTree);
 				break;
 			}
 		}
@@ -524,7 +529,7 @@ public class Parser {
 	}
 	
 	// 处理控制语句
-	private void control(SyntaxTreeNode father) throws Exception {
+	private void _control(SyntaxTreeNode father) throws Exception {
 		String tokenType = tokens.get(index).getType();
 		if(tokenType.equals("WHILE") || tokenType.equals("DO")) {
 			_while(father);
@@ -538,7 +543,7 @@ public class Parser {
 	}
 	
 	// 处理大括号里的部分
-	private void block(SyntaxTree fatherTree) throws Exception {
+	private void _block(SyntaxTree fatherTree) throws Exception {
 		index++;
 		SyntaxTree sentenceTree = new SyntaxTree();
 		sentenceTree.setRoot(new SyntaxTreeNode("Sentence"));
@@ -550,16 +555,16 @@ public class Parser {
 			
 			// 声明语句
 			if(sentencePattern.equals("STATEMENT")) {
-				statement(sentenceTree.getRoot());
+				_statement(sentenceTree.getRoot());
 			// 赋值语句
 			} else if(sentencePattern.equals("ASSIGNMENT")) {
-				assignment(sentenceTree.getRoot());
+				_assignment(sentenceTree.getRoot());
 			// 函数调用
 			} else if(sentencePattern.equals("FUNCTION_CALL")) {
-				functionCall(sentenceTree.getRoot());
+				_functionCall(sentenceTree.getRoot());
 			// 控制流语句
 			} else if(sentencePattern.equals("CONTROL")) {
-				control(sentenceTree.getRoot());
+				_control(sentenceTree.getRoot());
 			// return语句
 			} else if(sentencePattern.equals("RETURN")) {
 				_return(sentenceTree.getRoot());
@@ -574,7 +579,7 @@ public class Parser {
 	}
 	
 	// 函数声明
-	private void functionStatement(SyntaxTreeNode father) throws Exception {
+	private void _functionStatement(SyntaxTreeNode father) throws Exception {
 		if(null == father) father = tree.getRoot();
 		
 		SyntaxTree funcStatementTree = new SyntaxTree();
@@ -626,7 +631,8 @@ public class Parser {
 						HashMap<String, String> extraInfo = new HashMap<>();
 						extraInfo.put("type", tokens.get(index).getValue());
 						funcStatementTree.addChildNode(
-								new SyntaxTreeNode(tokens.get(index).getValue(), 
+								new SyntaxTreeNode(
+										tokens.get(index).getValue(), 
 										"FIELD_TYPE", 
 										extraInfo), 
 								param);
@@ -650,13 +656,13 @@ public class Parser {
 				index++;
 			// 如果是遇见了左大括号
 			} else if(tokens.get(index).getType().equals("LB_BRACKET")) {
-				block(funcStatementTree);
+				_block(funcStatementTree);
 			}
 		}
 	}
 	
 	// 函数调用
-	private void functionCall(SyntaxTreeNode father) throws Exception {
+	private void _functionCall(SyntaxTreeNode father) throws Exception {
 		if(null == father) father = tree.getRoot();
 		
 		SyntaxTree funcCallTree = new SyntaxTree();
@@ -753,16 +759,17 @@ public class Parser {
 			
 			// 如果是include句型
 			if(sentencePattern.equals("INCLUDE")) {
-				include(null);
+				_include(null);
 			// 函数声明语句
 			} else if(sentencePattern.equals("FUNCTION_STATEMENT")) {
-				functionStatement(null);
+				_functionStatement(null);
+//				break;
 			// 声明语句
 			} else if(sentencePattern.equals("STATEMENT")) {
-				statement(null);
+				_statement(null);
 			// 函数调用
 			} else if(sentencePattern.equals("FUNCTION_CALL")) {
-				functionCall(null);
+				_functionCall(null);
 			} else {
 				throw new Exception("main error");
 			}
@@ -781,7 +788,8 @@ public class Parser {
 		writer.write("( self: " + node.getValue() + " " + node.getType()
 							+ ", father: " + (node.getFather() == null ? null : node.getFather().getValue())
 							+ ", left: " + (node.getLeft() == null ? null : node.getLeft().getValue())
-							+ ", right: " + (node.getRight() == null ? null : node.getRight().getValue()));
+							+ ", right: " + (node.getRight() == null ? null : node.getRight().getValue())
+							+ " )");
 		writer.newLine();
 		SyntaxTreeNode child = node.getFirstSon();
 		while(null != child) {
