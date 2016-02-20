@@ -795,7 +795,7 @@ public class Parser {
 		while(null != child) {
 			display(child, writer);
 			child = child.getRight();
-		} 
+		}
 	}
 	
 	public static void outputParser(Parser parser, String src) throws IOException {
@@ -817,5 +817,7 @@ public class Parser {
 		parser.runParser();
 		src = "src/output/parser.txt";
 		outputParser(parser, src);
+		
+		System.out.println("\n\n------------------------------------------------------");
 	}
 }

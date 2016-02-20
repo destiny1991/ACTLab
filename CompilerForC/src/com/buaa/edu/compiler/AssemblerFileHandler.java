@@ -34,6 +34,7 @@ public class AssemblerFileHandler {
 	}
 	
 	public void insert(String value, String type) throws Exception {
+		System.out.println(value + "\t" + type);
 		// 插入到data域
 		if(type.equals("DATA")) {
 			result.add(dataPointer, value);

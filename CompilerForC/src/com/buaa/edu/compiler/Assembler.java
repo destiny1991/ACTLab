@@ -169,7 +169,7 @@ public class Assembler {
 			if(currentNode.getValue().equals("Type")) {
 				variableFieldType = currentNode.getFirstSon().getValue();
 			// 变量名
-			} else if(currentNode.getType().equals("IDENTIFIER'")) {
+			} else if(currentNode.getType() != null && currentNode.getType().equals("IDENTIFIER")) {
 				variableName = currentNode.getValue();
 				variableType = currentNode.getExtraInfo().get("type");
 				line = ".lcomm " + variableName + ", " + _sizeOf(variableFieldType);
@@ -203,7 +203,7 @@ public class Assembler {
 		
 		while(null != currentNode) {
 			// 函数名字
-			if(currentNode.getType().equals("FUNCTION_NAME")) {
+			if(currentNode.getType() != null && currentNode.getType().equals("FUNCTION_NAME")) {
 				funcName = currentNode.getValue();
 				if(!funcName.equals("scanf") && !funcName.equals("printf")) {
 					throw new Exception("function call except scanf and printf not supported yet");
@@ -228,12 +228,13 @@ public class Assembler {
 						Map<String, String> tmpMap = new HashMap<>();
 						tmpMap.put("type", "STRING_CONSTANT");
 						tmpMap.put("value", tmpNode.getValue());
+						symbolTable.put(label, tmpMap);
 						parameterList.add(label);
 					// 是某个变量
 					} else if(tmpNode.getType().equals("IDENTIFIER")) {
 						parameterList.add(tmpNode.getValue());
 					} else if(tmpNode.getType().equals("ADDRESS")) {
-						
+						// ..
 					} else {
 						throw new Exception("parameter type is not supported yet");
 					}
@@ -256,19 +257,27 @@ public class Assembler {
 				} else if(symbolTable.get(parameter).get("type").equals("VARIABLE")) {
 					String fieldType = symbolTable.get(parameter).get("field_type");
 					if(fieldType.equals("int")) {
-						
+						String line = "pushl " + parameter;
+						assFileHandler.insert(line, "TEXT");
+						num++;
 					} else if(fieldType.equals("float")) {
-						
+						String line = "flds " + parameter;
+						assFileHandler.insert(line, "TEXT");
+						line = "subl $8, %esp";
+						assFileHandler.insert(line, "TEXT");
+						line = "fstpl (%esp)";
+						assFileHandler.insert(line, "TEXT");
+						num += 2;
 					} else {
 						throw new Exception("field type except int and float is not supported yet!");
 					}
 				} else {
-					throw new Exception("parameter type not supported in printf yet");
+					//throw new Exception("parameter type not supported in printf yet");
 				}
 			}
 			String line = "call printf";
 			assFileHandler.insert(line, "TEXT");
-			line = "add $" + (num*4) + ", %esp";;
+			line = "add $" + (num*4) + ", %esp";
 			assFileHandler.insert(line, "TEXT");
 		} else if(funcName.equals("scanf")) {
 			int num = 0;
@@ -574,8 +583,8 @@ public class Assembler {
 						// 记录到符号表中
 						tmpMap = new HashMap<>();
 						tmpMap.put("type", "IDENTIFIER");
-						tmpMap.put("operand", "int");
-						symbolTable.put("field_type", tmpMap);
+						tmpMap.put("field_type", "int");
+						symbolTable.put("bss_tmp", tmpMap);
 					}
 				} else if(operator.equals("-")) {
 					if(containFloat) {
@@ -693,7 +702,7 @@ public class Assembler {
 						tmpMap = new HashMap<>();
 						tmpMap.put("type", "IDENTIFIER");
 						tmpMap.put("field_type", "float");
-						symbolTable.put("",tmpMap);
+						symbolTable.put("bss_tmp",tmpMap);
 					} else {
 						throw new Exception("other div not supported yet");
 					}
