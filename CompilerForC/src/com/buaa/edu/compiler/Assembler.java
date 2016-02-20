@@ -108,7 +108,7 @@ public class Assembler {
 	
 	// include句型
 	private void _include(SyntaxTreeNode node) {
-		
+		// ..
 	}
 	
 	// 函数定义句型
@@ -787,7 +787,7 @@ public class Assembler {
 	}
 	
 	// 处理某一种句型
-	private void handler_block(SyntaxTreeNode node) throws Exception {
+	private void handlerSentenceblock(SyntaxTreeNode node) throws Exception {
 		if(null == node) return;
 		
 		// 下一个将要遍历的节点
@@ -833,13 +833,11 @@ public class Assembler {
 		}
 	}
 	
-	// 遍历节点
-	public void traverse(SyntaxTreeNode node) throws Exception {
-		handler_block(node);
-		SyntaxTreeNode nextNode = node.getRight();
-		while(null != nextNode) {
-			handler_block(nextNode);
-			nextNode = nextNode.getRight();
+	// 从左向右遍历某一层的全部节点
+	public void traverse(SyntaxTreeNode node) throws Exception {		
+		while(node != null) {
+			handlerSentenceblock(node);
+			node = node.getRight();
 		}
 	}
 	
@@ -861,6 +859,6 @@ public class Assembler {
 		Assembler assembler = new Assembler(parser.getTree());
 		assembler.traverse(assembler.getTree().getRoot());
 		src = "src/output/assembler.txt";
-		assembler.assFileHandler.generateAssFile(src);
+		assembler.getAssFileHandler().generateAssFile(src);
 	}
 }
