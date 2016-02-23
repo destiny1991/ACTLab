@@ -283,7 +283,7 @@ public class CompileVerification {
 
 	public static void main(String[] args) {
 		CompileVerification cv = new CompileVerification();
-		String inputPath = "src/input/switch.txt";
+		String inputPath = "src/input/arithmetic.txt";
 		cv.runApp(inputPath);
 	}
 }
