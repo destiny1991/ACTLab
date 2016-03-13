@@ -1,0 +1,70 @@
+	.file	"sum.c"
+	.section .rodata
+	.align 2
+.LC0:
+	.string	"%d:"
+	.align 2
+.LC3:
+	.string	"sum is %d:"
+	.section ".text"
+	.align 2
+	.globl main
+	.type main, @function
+main:
+	stwu 1,-16(1)
+	stw 31,12(1)
+	mr 31,1
+
+	lis 0,.LC0@ha
+	addic 10,0,.LC0@l
+	mr 3,10
+	addi 11,31,n
+	mr 4,11
+	crxor 6,6,6
+	bl __isoc99_scanf
+
+	lwz 0,n(31)
+	stw 0,tmp(31)
+
+	li 0,1
+	stw 0,i(31)
+
+	b .L1
+.L2:
+	lwz 9,sum(31)
+	lwz 0,i(31)
+	add 0,9,0
+	stw 0,bss_tmp(31)
+
+	lwz 0,bss_tmp(31)
+	stw 0,sum(31)
+
+	lwz 0,i(31)
+	addic 0,0,1
+	stw 0,i(31)
+
+.L1
+	lwz 0,i(31)
+	lwz 9,n(31)
+	cmp 28,0,0,9
+	stw 0,relational_tmp(31)
+
+	lwz 0,relational_tmp(31)
+	cmpi 7,0,0,0
+	bc	12,29,.L2
+
+	lis 0,.LC3@ha
+	addic 0,0,.LC3@l
+	mr 3,0
+	lwz 4,sum(31)
+	crxor 6,6,6
+	bl printf
+
+	li 0,0
+	mr 3,0
+	addi 11,31,16
+	lwz 31,-4(11)
+	mr 1,11
+	blr
+	.size	main, .-main
+	.ident	"powerpc-e500v2-linux-gnuspe-gcc"
