@@ -14,7 +14,6 @@ import java.util.List;
 public class AssemblerFileHandler {
 	private List<String> result;
 	private int dataPointer;
-	private int bssPointer;
 	private int textPointer;
 	
 	public AssemblerFileHandler() {
@@ -22,15 +21,12 @@ public class AssemblerFileHandler {
 		result = new ArrayList<String>() {
 			private static final long serialVersionUID = 1L;
 			{
-				add(".data");
-				add(".bss");
-				add(".lcomm bss_tmp, 4");
-				add(".text");
+				add("	.section .rodata");
+				add("	.section \".text\"");
 			}
 		};
 		dataPointer = 1;
-		bssPointer = 3;
-		textPointer = 4;
+		textPointer = 2;
 	}
 	
 	public void insert(String value, String type) throws Exception {
@@ -39,12 +35,6 @@ public class AssemblerFileHandler {
 		if(type.equals("DATA")) {
 			result.add(dataPointer, value);
 			dataPointer++;
-			bssPointer++;
-			textPointer++;
-		// 插入到bss域	
-		} else if(type.equals("BSS")) {
-			result.add(bssPointer, value);
-			bssPointer++;
 			textPointer++;
 		// 插入到代码段
 		} else if(type.equals("TEXT")) {
@@ -56,12 +46,16 @@ public class AssemblerFileHandler {
 	}
 	
 	// 将结果保存到文件中
-	public void generateAssFile(String src) throws IOException {
+	public void generateAssFile(String src, String filename) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(src));
+		writer.write("	.file	\"" + filename + "\"");
+		writer.newLine();
 		for(String item : result) {
 			writer.write(item);
 			writer.newLine();
 		}
+		writer.write("	.ident	\"powerpc-e500v2-linux-gnuspe-gcc\"");
+		writer.newLine();
 		writer.close();
 	}
 }

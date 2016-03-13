@@ -321,7 +321,6 @@ public class Parser {
 			reversePolishExpression.add(operatorStack.pop());
 		}
 		
-		
 		// 操作数栈
 		Stack<SyntaxTree> operandStack = new Stack<SyntaxTree>();
 		String[][] childOperators = {
@@ -375,7 +374,7 @@ public class Parser {
 		assignTree.setCurrent(assignTree.getRoot());
 		tree.addChildNode(assignTree.getRoot(), father);
 		
-		while(!tokens.get(index).getType().equals("SEMICOLON")) {
+		while(!tokens.get(index).getType().equals("SEMICOLON")) {			
 			// 被赋值的变量
 			if(tokens.get(index).getType().equals("IDENTIFIER")) {
 				assignTree.addChildNode(
@@ -498,6 +497,8 @@ public class Parser {
 		// 标记for语句是否结束
 		while(true) {
 			String tokenType = tokens.get(index).getType();
+			System.out.println(tokenType);
+			
 			// for标记
 			if(tokenType.equals("FOR")) {
 				index++;
@@ -531,6 +532,7 @@ public class Parser {
 	// 处理控制语句
 	private void _control(SyntaxTreeNode father) throws Exception {
 		String tokenType = tokens.get(index).getType();
+		System.out.println(tokenType);
 		if(tokenType.equals("WHILE") || tokenType.equals("DO")) {
 			_while(father);
 		} else if(tokenType.equals("IF")) {
@@ -552,6 +554,8 @@ public class Parser {
 		
 		while(true) {
 			String sentencePattern = judgeSentencePattern();
+			
+			System.out.println(sentencePattern);
 			
 			// 声明语句
 			if(sentencePattern.equals("STATEMENT")) {
@@ -590,6 +594,9 @@ public class Parser {
 		// 函数声明语句什么时候结束
 		boolean flag = true;
 		while(flag && index < tokens.size()) {
+			
+			System.out.println(tokens.get(index).getValue());
+			
 			// 如果是函数返回类型
 			if(isDataType(tokens.get(index).getValue())) {
 				SyntaxTreeNode returnType = new SyntaxTreeNode("Type");
@@ -756,6 +763,8 @@ public class Parser {
 		
 		while(index < tokens.size()) {
 			String sentencePattern = judgeSentencePattern();
+			
+			System.out.println(sentencePattern);
 			
 			// 如果是include句型
 			if(sentencePattern.equals("INCLUDE")) {

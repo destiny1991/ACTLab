@@ -98,7 +98,7 @@ public class Try {
 		String string = "wordgoodgoodgoodbestword";
 		String[] words = {"word","good","best","good"};
 		
-		List res = findSubstring(string, words);
+		List<Integer> res = findSubstring(string, words);
 		System.out.println(res);
 	}
 }

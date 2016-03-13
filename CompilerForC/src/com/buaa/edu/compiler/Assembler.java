@@ -108,51 +108,44 @@ public class Assembler {
 	
 	// include句型
 	private void _include(SyntaxTreeNode node) {
-		// ..
+		// 不用处理，不会生成对应的汇编代码
 	}
 	
 	// 函数定义句型
 	private void _functionStatement(SyntaxTreeNode node) throws Exception {
 		// 第一个儿子
 		SyntaxTreeNode currentNode = node.getFirstSon();
+		String funcName = null;
 		while(currentNode != null) {
 			if(currentNode.getValue().equals("FunctionName")) {
 				if(!currentNode.getFirstSon().getValue().equals("main")) {
 					throw new Exception("other function statement except for main is not supported");
 				} else {
-					assFileHandler.insert(".globl main", "TEXT");
+					funcName = "main";
+					assFileHandler.insert("	.align 2", "TEXT");
+					assFileHandler.insert("	.globl main", "TEXT");
+					assFileHandler.insert("	.type main, @function", "TEXT");
 					assFileHandler.insert("main:", "TEXT");
-					assFileHandler.insert("finit", "TEXT");
+					assFileHandler.insert("	stwu 1,-16(1)", "TEXT");
+					assFileHandler.insert("	stw 31,12(1)", "TEXT");
+					assFileHandler.insert("	mr 31,1", "TEXT");
+					assFileHandler.insert("", "TEXT");
 				}
 			} else if(currentNode.getValue().equals("Sentence")) {
 				traverse(currentNode.getFirstSon());
 			}
 			currentNode = currentNode.getRight();
 		}
-	}
-	
-	// sizeof
-	private int _sizeOf(String type) {
-		if(type.equals("int") || type.equals("float") || type.equals("long")) {
-			return 4;
-		} else if(type.equals("char")) {
-			return 1;
-		} else if(type.equals("double")) {
-			return 8;
+		if(null !=funcName && funcName.equals("main")) {
+			assFileHandler.insert("	addi 11,31,16", "TEXT");
+			assFileHandler.insert("	lwz 31,-4(11)", "TEXT");
+			assFileHandler.insert("	mr 1,11", "TEXT");
+			assFileHandler.insert("	blr", "TEXT");
+			assFileHandler.insert("	.size	main, .-main", "TEXT");
 		}
-		return -1;
 	}
 	
-	private String joinArray(List<String> array, String sep) {
-		StringBuffer sb = new StringBuffer();
-		for(int i = 0; i < array.size() - 1 ; i++) {
-			sb.append(array.get(i) + sep + " ");
-		}
-		sb.append(array.get(array.size() - 1));
-		return sb.toString();
-	}
-	
-	// 声明语句
+	// 变量声明语句
 	private void _statement(SyntaxTreeNode node) throws Exception {
 		// 对应的汇编代码中的声明语句
 		String line = null;
@@ -171,23 +164,23 @@ public class Assembler {
 			// 变量名
 			} else if(currentNode.getType() != null && currentNode.getType().equals("IDENTIFIER")) {
 				variableName = currentNode.getValue();
-				variableType = currentNode.getExtraInfo().get("type");
-				line = ".lcomm " + variableName + ", " + _sizeOf(variableFieldType);
+				variableType = currentNode.getExtraInfo().get("type");	
 			// 数组元素
 			} else if(currentNode.getValue().equals("ConstantList")) {
-				line = variableName + ": ." + variableFieldType + " ";
+				line = "	.align 2";
+				assFileHandler.insert(line, "DATA");
+				line = "." + variableName + ":";
+				assFileHandler.insert(line, "DATA");
+				
 				SyntaxTreeNode tmpNode = currentNode.getFirstSon();
-				// 保存该数组
-				List<String> array = new ArrayList<>();
 				while(null != tmpNode) {
-					array.add(tmpNode.getValue());
+					line = "." + variableFieldType + "	" + tmpNode.getValue();
+					assFileHandler.insert(line, "DATA");
 					tmpNode = tmpNode.getRight();
 				}
-				line += joinArray(array, ",");
 			}
 			currentNode = currentNode.getRight();
 		}
-		assFileHandler.insert(line, variableType.equals("VARIABLE")? "BSS" : "DATA");
 		// 将该变量存入符号表
 		Map<String, String> tmpMap = new HashMap<String, String>();
 		tmpMap.put("type", variableType);
@@ -216,11 +209,15 @@ public class Assembler {
 					if(tmpNode.getType().equals("DIGIT_CONSTANT") 
 							|| tmpNode.getType().equals("STRING_CONSTANT")) {
 						// 汇编中该参数的名称
-						String label = "label_" + labelCnt;
+						String label = ".LC" + labelCnt;
 						labelCnt++;
 						if(tmpNode.getType().equals("STRING_CONSTANT")) {
 							// 添加数据段中该参数定义
-							String line = label + ": .asciz \"" + tmpNode.getValue() + "\"";
+							String line = "	.align 2";
+							assFileHandler.insert(line, "DATA");
+							line = label + ":";
+							assFileHandler.insert(line, "DATA");
+							line = "	.string	\"" + tmpNode.getValue() + ":\"";
 							assFileHandler.insert(line, "DATA");
 						} else {
 							throw new Exception("in functionc_call digital constant parameter is not supported yet");
@@ -234,7 +231,7 @@ public class Assembler {
 					} else if(tmpNode.getType().equals("IDENTIFIER")) {
 						parameterList.add(tmpNode.getValue());
 					} else if(tmpNode.getType().equals("ADDRESS")) {
-						// ..
+						// 暂不处理
 					} else {
 						throw new Exception("parameter type is not supported yet");
 					}
@@ -246,57 +243,87 @@ public class Assembler {
 		
 		// 添加到代码段
 		if(funcName.equals("printf")) {
-			int num = 0;
-			for(int i = parameterList.size() - 1 ; i >= 0; i--) {
+			int num = 3;
+			//for(int i = parameterList.size() - 1 ; i >= 0; i--) {
+			for(int i = 0; i < parameterList.size(); i++) {
 				String parameter = parameterList.get(i);
 				// 如果该参数的类型是字符串常量
 				if(symbolTable.get(parameter).get("type").equals("STRING_CONSTANT")) {
-					String line = "pushl $" + parameter;
+					String line = "	lis 0," + parameter + "@ha";
 					assFileHandler.insert(line, "TEXT");
+					line = "	addic 0,0," + parameter + "@l";
+					assFileHandler.insert(line, "TEXT");
+					line =  "	mr " + num + ",0";
 					num++;
+					assFileHandler.insert(line, "TEXT");
 				} else if(symbolTable.get(parameter).get("type").equals("VARIABLE")) {
 					String fieldType = symbolTable.get(parameter).get("field_type");
-					if(fieldType.equals("int")) {
-						String line = "pushl " + parameter;
-						assFileHandler.insert(line, "TEXT");
+					if(fieldType.equals("int") || fieldType.equals("long")) {
+						String line = "	lwz " + num +  "," + parameter + "(31)";
 						num++;
-					} else if(fieldType.equals("float")) {
-						String line = "flds " + parameter;
 						assFileHandler.insert(line, "TEXT");
-						line = "subl $8, %esp";
-						assFileHandler.insert(line, "TEXT");
-						line = "fstpl (%esp)";
-						assFileHandler.insert(line, "TEXT");
-						num += 2;
+					} else if(fieldType.equals("float")) {						
+//						String line = "	lwz 9," + parameter + "(31)";
+//						assFileHandler.insert(line, "TEXT");
+//						num++;
+//						line = "	evmergehi 7,9,9";
+//						assFileHandler.insert(line, "TEXT");
+//						line = "	mr 8,9";
+//						assFileHandler.insert(line, "TEXT");
+//						line = "	stw " + num + "," + (4*num) + "(31)";
+//						assFileHandler.insert(line, "TEXT");
+//						line =  "	mr " + num + ",9";
+//						assFileHandler.insert(line, "TEXT");
+//						num ++;
+						throw new Exception("Sorry, printf not support float type!");
 					} else {
-						throw new Exception("field type except int and float is not supported yet!");
+						throw new Exception("other type in printf is not supported yet!");
 					}
 				} else {
-					//throw new Exception("parameter type not supported in printf yet");
+					throw new Exception("parameter type not supported in printf yet");
 				}
 			}
-			String line = "call printf";
+			String line = "	crxor 6,6,6";
 			assFileHandler.insert(line, "TEXT");
-			line = "add $" + (num*4) + ", %esp";
+			line = "	bl printf";
 			assFileHandler.insert(line, "TEXT");
 		} else if(funcName.equals("scanf")) {
-			int num = 0;
-			for(int i = parameterList.size() - 1 ; i >= 0 ; i--) {
+			int num = 3;
+			for(int i = 0; i < parameterList.size(); i++) {
 				String parameter = parameterList.get(i);
 				String parameterType = symbolTable.get(parameter).get("type");
-				if(parameterType.equals("STRING_CONSTANT") || parameterType.equals("VARIABLE")) {
-					num++;
-					String line = "pushl $" + parameter;
+				if(parameterType.equals("STRING_CONSTANT")) {
+					String line = "	lis 0," + parameter + "@ha";
 					assFileHandler.insert(line, "TEXT");
+					line = "	addic " + (num + 7) + ",0," + parameter + "@l";
+					assFileHandler.insert(line, "TEXT");
+					line = "	mr " + num + "," + (num + 7);
+					num++;
+					assFileHandler.insert(line, "TEXT");
+				} else if(parameterType.equals("VARIABLE")) {
+					String fieldType = symbolTable.get(parameter).get("field_type");
+					if(fieldType.equals("int") || fieldType.equals("long")) {
+						String line = "	addi " + (num + 7) + ",31," + parameter;
+						assFileHandler.insert(line, "TEXT");
+						line = "	mr " + num + "," + (num + 7);
+						num++;
+						assFileHandler.insert(line, "TEXT");
+					} else if(fieldType.equals("float")) {
+						// 浮点数加入后，代码变得复杂，所以暂未实现
+						throw new Exception("Sorry, scanf not support float type!");
+					} else {
+						throw new Exception("other type in scanf is not supported yet!");
+					}
 				} else {
 					throw new Exception("parameter type not supported in scanf");
 				}
 			}
-			String line = "call scanf";
+			String line = "	crxor 6,6,6";
 			assFileHandler.insert(line, "TEXT");
-			line = "add $" + (num*4) + ", %esp";
+			line = "	bl __isoc99_scanf";
 			assFileHandler.insert(line, "TEXT");
 		}
+		assFileHandler.insert("", "TEXT");	// 增加一个空行
 	}
 	
 	// 赋值语句
@@ -310,26 +337,50 @@ public class Assembler {
 			if(fieldType.equals("int")) {
 				// 常数
 				if(expres.get("type").equals("CONSTANT")) {
-					String line = "movl $" + expres.get("value") + ", " + currentNode.getValue();
+					// movl $0, temp
+					//String line = "movl $" + expres.get("value") + ", " + currentNode.getValue();
+					//assFileHandler.insert(line, "TEXT");
+					
+					String line = "	li 0," + expres.get("value");
 					assFileHandler.insert(line, "TEXT");
+					line = "	stw 0," + currentNode.getValue() + "(31)";
+					assFileHandler.insert(line, "TEXT");
+				// 变量
 				} else if(expres.get("type").equals("VARIABLE")) {
-					String line = "movl " + expres.get("value") + ", %edi";
+					// 把数放到r0中，再把r0总的数转到目标寄存器中, 同float
+					String line = "	lwz 0," + expres.get("value") + "(31)";
 					assFileHandler.insert(line, "TEXT");
-					line = "movl %edi, " + currentNode.getValue();
+					line = "	stw 0," + currentNode.getValue() + "(31)";
 					assFileHandler.insert(line, "TEXT");
 				} else {
-					
+					throw new Exception("_assignment : only support constant and varivale!");
 				}
 			} else if(fieldType.equals("float")) {
-				if(expres.get("type").equals("CONSTANT")) {
-					String line = "movl $" + expres.get("value") + ", " + currentNode.getValue();
+				if(expres.get("type").equals("CONSTANT")) {					
+					// data域
+					String line = "	.align 2";
+					assFileHandler.insert(line, "DATA");
+					String label = ".LC" + labelCnt;
+					labelCnt++;
+					line = label + ":";
+					assFileHandler.insert(line, "DATA");
+					int fTob = Float.floatToIntBits(Float.parseFloat(expres.get("value")));
+					line = "	.long " + fTob;
+					assFileHandler.insert(line, "DATA");
+					
+					// text域
+					line = "	lis 0," + label + "@ha";
 					assFileHandler.insert(line, "TEXT");
-					line = "filds " + currentNode.getValue();
+					line = "	mr 9,0";
 					assFileHandler.insert(line, "TEXT");
-					line = "fstps " + currentNode.getValue();
+					line = "	lwz 0," + label + "@l(9)";
 					assFileHandler.insert(line, "TEXT");
+					line  = "	stw 0," + currentNode.getValue() + "(31)";
 				} else {
-					String line = "fstps " + currentNode.getValue();
+					// 把数放到r0中，再把r0总的数转到目标寄存器中
+					String line = "	lwz 0," + expres.get("value") + "(31)";
+					assFileHandler.insert(line, "TEXT");
+					line = "	stw 0," + currentNode.getValue() + "(31)";
 					assFileHandler.insert(line, "TEXT");
 				}
 			} else {
@@ -338,14 +389,15 @@ public class Assembler {
 		} else {
 			throw new Exception("assignment wrong");
 		}
+		assFileHandler.insert("", "TEXT");
 	}
 	
 	// if else语句
 	private void _controlIf(SyntaxTreeNode node) throws Exception {
 		SyntaxTreeNode currentNode = node.getFirstSon();
-		labelsIfelse.put("label_else", "label_" + labelCnt);
+		labelsIfelse.put("label_else", ".L" + labelCnt);
 		labelCnt++;
-		labelsIfelse.put("label_end", "label_" + labelCnt);
+		labelsIfelse.put("label_end", ".L" + labelCnt);
 		labelCnt++;
 		
 		while(null != currentNode) {
@@ -355,8 +407,11 @@ public class Assembler {
 					throw new Exception("control_if error");
 				}
 				_expression(currentNode.getFirstSon());
+				String line = "	cmpi 7,0,0,0";
+				assFileHandler.insert(line, "TEXT");
+				line = "	bc 4,29," + labelsIfelse.get("label_else");
 				traverse(currentNode.getFirstSon().getRight().getFirstSon());
-				String line = "jmp " + labelsIfelse.get("label_end");
+				line = "	b " + labelsIfelse.get("label_end");
 				assFileHandler.insert(line, "TEXT");
 				line = labelsIfelse.get("label_else") + ":";
 				assFileHandler.insert(line, "TEXT");
@@ -374,32 +429,48 @@ public class Assembler {
 		SyntaxTreeNode currentNode = node.getFirstSon();
 		// 遍历的是for循环中的那个部分
 		int cnt = 2;
+		SyntaxTreeNode forCondition = null;
 		while(null != currentNode) {
 			// for第一部分
 			if(currentNode.getValue().equals("Assignment")) {
 				_assignment(currentNode);
 			// for第二、三部分
 			} else if(currentNode.getValue().equals("Expression")) {
+				// 第2部分
 				if(cnt == 2) {
 					cnt++;
-					String line = "label_" + labelCnt + ":";
-					assFileHandler.insert(line, "TEXT");
+					String label = ".L" + labelCnt;
 					labelCnt++;
-					_expression(currentNode);
+					String line = "	b " + label;
+					assFileHandler.insert(line, "TEXT");
+					label = ".L" + labelCnt;
+					labelCnt++;
+					line = label + ":";
+					assFileHandler.insert(line, "TEXT");
+					
+					forCondition = currentNode;
+					//_expression(currentNode);
+				// 第3部分
 				} else {
 					_expression(currentNode);
 				}
-			// for语句部分
+			// for语句块的部分
 			} else if(currentNode.getValue().equals("Sentence")) {
 				traverse(currentNode.getFirstSon());
 			}
 			currentNode = currentNode.getRight();
 		}
-		String line = "jmp label_" + (labelCnt - 1);
+		
+		String line = ".L" + (labelCnt - 2);
 		assFileHandler.insert(line, "TEXT");
-		line = "label_" + labelCnt + ":";
+		if(forCondition != null) _expression(forCondition);
+		line = "	lwz 0,relational_tmp(31)";
 		assFileHandler.insert(line, "TEXT");
-		labelCnt++;
+		line = "	cmpi 7,0,0,0";
+		assFileHandler.insert(line, "TEXT");
+		line = "	bc	12,29," + ".L" + (labelCnt - 1);
+		assFileHandler.insert(line, "TEXT");
+		assFileHandler.insert("", "TEXT");	// 增加一个空行
 	}
 	
 	// while语句
@@ -417,9 +488,9 @@ public class Assembler {
 			currentNode = currentNode.getRight();
 			Map<String, String> expres = _expression(currentNode);
 			if(expres.get("type").equals("CONSTANT")) {
-				String line = "pushl $" + expres.get("value");
+				String line = "	li 0," + expres.get("value");
 				assFileHandler.insert(line, "TEXT");
-				line = "call exit";
+				line = "	mr 3,0";
 				assFileHandler.insert(line, "TEXT");
 			} else {
 				throw new Exception("return type not supported");
@@ -503,14 +574,6 @@ public class Assembler {
 			}
 		};
 		
-		// 运算符对汇编指令的映射
-		Map<String, String> operatorMap = new HashMap<String, String>() {
-			private static final long serialVersionUID = 1L;
-			{
-				put(">", "jbe"); put("<", "jae");
-				put(">=", "jb"); put("<=", "ja");
-			}
-		};
 		
 		while(!operatorStack.empty()) {
 			String operator = operatorStack.pop();
@@ -521,59 +584,51 @@ public class Assembler {
 				
 				if(operator.equals("+")) {
 					if(containFloat) {
-						String line = _isFloat(operand_a) ? "flds " : "filds ";
-						line += operand_a.get("operand");
-						assFileHandler.insert(line, "TEXT");
-						line = _isFloat(operand_b) ? "fadd " : "fiadd ";
-						line += operand_b.get("operand");
-						assFileHandler.insert(line, "TEXT");
-						
-						// 计算结果保存到bss_tmp中
-						line = "fstps bss_tmp";
-						assFileHandler.insert(line, "TEXT");
-						line = "flds bss_tmp";
-						assFileHandler.insert(line, "TEXT");
-						// 计算结果压栈
-						Map<String, String> tmpMap = new HashMap<>();
-						tmpMap.put("type", "VARIABLE");
-						tmpMap.put("operand", "bss_tmp");
-						operandStack.add(tmpMap);
-						// 记录到符号表中
-						tmpMap = new HashMap<>();
-						tmpMap.put("type", "IDENTIFIER");
-						tmpMap.put("field_type", "float");
-						symbolTable.put("bss_tmp", tmpMap);
+						throw new Exception("Sorry, only support int type!");
 					} else {
 						// 第一个操作数
 						if(operand_a.get("type").equals("ARRAY_ITEM")) {
-							String line = "movl " + operand_a.get("operand1") + ", %edi";
-							assFileHandler.insert(line, "TEXT");
-							line = "movl " + operand_a.get("operand0") + "(, %edi, 4), %eax";
-							assFileHandler.insert(line, "TEXT");
+							
+							throw new Exception("Not support array operation yet!");
+							
 						} else if(operand_a.get("type").equals("VARIABLE")) {
-							String line = "movl " + operand_a.get("operand") + ", %eax";
+//							String line = "movl " + operand_a.get("operand") + ", %eax";
+//							assFileHandler.insert(line, "TEXT");							
+							String line = "	lwz 9," + operand_a.get("operand") + "(31)";
 							assFileHandler.insert(line, "TEXT");
+							
 						} else if(operand_a.get("type").equals("CONSTANT")) {
-							String line = "movl $" + operand_a.get("operand") + ", %eax";
+//							String line = "movl $" + operand_a.get("operand") + ", %eax";
+//							assFileHandler.insert(line, "TEXT");
+							String line = "	li 9," + operand_a.get("operand");
 							assFileHandler.insert(line, "TEXT");
 						}
 						
 						// 加上第二个操作数
 						if(operand_b.get("type").equals("ARRAY_ITEM")) {
-							String line = "movl " + operand_b.get("operand1") + ", %edi";
-							assFileHandler.insert(line, "TEXT");
-							line = "addl " + operand_b.get("operand0") + "(, %edi, 4), %eax";
-							assFileHandler.insert(line, "TEXT");
+//							String line = "movl " + operand_b.get("operand1") + ", %edi";
+//							assFileHandler.insert(line, "TEXT");
+//							line = "addl " + operand_b.get("operand0") + "(, %edi, 4), %eax";
+//							assFileHandler.insert(line, "TEXT");
+							throw new Exception("Not support array operation yet!");
 						} else if(operand_b.get("type").equals("VARIABLE")) {
-							String line = "addl " + operand_b.get("operand") + ", %eax";
+//							String line = "addl " + operand_b.get("operand") + ", %eax";
+//							assFileHandler.insert(line, "TEXT");
+							String line = "	lwz 0," + operand_b.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");
+							line = "	add 0,9,0";
 							assFileHandler.insert(line, "TEXT");
 						} else if(operand_b.get("type").equals("CONSTANT")) {
-							String line = "addl $" + operand_b.get("operand") + ", %eax";
+//							String line = "addl $" + operand_b.get("operand") + ", %eax";
+//							assFileHandler.insert(line, "TEXT");
+							String line = "	li 0," + operand_b.get("operand");
+							assFileHandler.insert(line, "TEXT");
+							line = "	add 0,9,0";
 							assFileHandler.insert(line, "TEXT");
 						}
 						
 						// 赋值给临时操作数
-						String line = "movl %eax, bss_tmp";
+						String line = "	stw 0,bss_tmp(31)";
 						assFileHandler.insert(line, "TEXT");
 						// 计算结果压栈
 						Map<String, String> tmpMap = new HashMap<>();
@@ -588,50 +643,36 @@ public class Assembler {
 					}
 				} else if(operator.equals("-")) {
 					if(containFloat) {
-						// 操作数a
-						if(_isFloat(operand_a)) {
-							if(operand_a.get("type").equals("VARIABLE")) {
-								String line = _isFloat(operand_a) ? "flds " : "filds ";
-								line += operand_a.get("operand");
-								assFileHandler.insert(line, "TEXT");
-							} else {
-								// ..
-							}
-						} else {
-							if(operand_a.get("type").equals("CONSTANT")) {
-								String line = "movl $" + operand_a.get("operand") + ", bss_tmp";
-								assFileHandler.insert(line, "TEXT");
-							} else {
-								// ..
-							}
+						throw new Exception("sub operator not suppor float type");
+					} else {
+						// 被减数
+						if(operand_a.get("type").equals("ARRAY_ITEM")) {
+							throw new Exception("not support array operation yet!");
+						}else if(operand_a.get("type").equals("VARIABLE")) {						
+							String line = "	lwz 9," + operand_a.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");							
+						} else if(operand_a.get("type").equals("CONSTANT")) {
+							String line = "	li 9," + operand_a.get("operand");
+							assFileHandler.insert(line, "TEXT");
 						}
 						
-						// 操作数b
-						if(_isFloat(operand_b)) {
-							if(operand_b.get("type").equals("VARIABLE")) {
-								String line = _isFloat(operand_b) ? "flds " : "filds ";
-								line += operand_b.get("operand");
-								assFileHandler.insert(line, "TEXT");
-								line = "fsub " + operand_b.get("operand");
-								assFileHandler.insert(line, "TEXT");
-							} else {
-								// ..
-							}
-						} else {
-							if(operand_b.get("type").equals("CONSTANT")) {
-								String line = "movl $" + operand_b.get("operand") + ", bss_tmp";
-								assFileHandler.insert(line, "TEXT");
-								line = "fisub bss_tmp";
-								assFileHandler.insert(line, "TEXT");
-							} else {
-								// ..
-							}
+						// 减数
+						if(operand_b.get("type").equals("ARRAY_ITEM")) {
+							throw new Exception("Not support array operation yet!");
+						} else if(operand_b.get("type").equals("VARIABLE")) {
+							String line = "	lwz 0," + operand_b.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");
+							line = "	subf 0,9,0";
+							assFileHandler.insert(line, "TEXT");
+						} else if(operand_b.get("type").equals("CONSTANT")) {
+							String line = "	li 0," + operand_b.get("operand");
+							assFileHandler.insert(line, "TEXT");
+							line = "	subf 0,9,0";
+							assFileHandler.insert(line, "TEXT");
 						}
 						
-						// 计算结果保存到bss_tmp中 
-						String line = "fstps bss_tmp";
-						assFileHandler.insert(line, "TEXT");
-						line = "flds bss_tmp";
+						// 赋值给临时操作数
+						String line = "	stw 0,bss_tmp(31)";
 						assFileHandler.insert(line, "TEXT");
 						// 计算结果压栈
 						Map<String, String> tmpMap = new HashMap<>();
@@ -641,139 +682,287 @@ public class Assembler {
 						// 记录到符号表中
 						tmpMap = new HashMap<>();
 						tmpMap.put("type", "IDENTIFIER");
-						tmpMap.put("field_type", "float");
+						tmpMap.put("field_type", "int");
 						symbolTable.put("bss_tmp", tmpMap);
-					} else {
-						throw new Exception("- not support int or other types");
 					}
-						
-				// 尚未考虑浮点数，只考虑整数乘法
+				// 整数乘法
 				} else if(operator.equals("*")) {
-					if(operand_a.get("type").equals("ARRAY_ITEM")) {
-						String line = "movl " + operand_a.get("operand1") + ", %edi";
-						assFileHandler.insert(line, "TEXT");
-						line = "movl " + operand_a.get("operand0") + "(, %edi, 4), %eax";
-						assFileHandler.insert(line, "TEXT");
-					} else {
-						throw new Exception("other MUL not supported yet");
-					}
-					
-					if(operand_b.get("type").equals("ARRAY_ITEM")) {
-						String line = "movl " + operand_b.get("operand1") + ", %edi";
-						assFileHandler.insert(line, "TEXT");
-						// 相乘
-						line = "mull " + operand_b.get("operand0")  + "(, %edi, 4)";
-						assFileHandler.insert(line, "TEXT");
-					} else {
-						throw new Exception("other MUL not supported yet");
-					}
-					// 将所得结果压入栈
-					String line = "movl %eax, bss_tmp";
-					assFileHandler.insert(line, "TEXT");
-					Map<String, String> tmpMap = new HashMap<>();
-					tmpMap.put("type", "VARIABLE");
-					tmpMap.put("operand", "bss_tmp");
-					operandStack.push(tmpMap);
-					tmpMap = new HashMap<>();
-					tmpMap.put("type", "IDENTIFIER");
-					tmpMap.put("field_type", "int");
-					symbolTable.put("bss_tmp", tmpMap);
-				} else if(operator.equals("/")) {
 					if(containFloat) {
-						String line = _isFloat(operand_a) ? "flds " : "filds ";
-						line += operand_a.get("operand");
-						assFileHandler.insert(line, "TEXT");
 						
-						line = _isFloat(operand_b) ? "fdiv " : "fidiv ";
-						line += operand_b.get("operand");
-						assFileHandler.insert(line, "TEXT");
+						throw new Exception("mul operator not suppor float type");
 						
-						// 计算结果保存到bss_tmp中
-						line = "fstps bss_tmp";
-						assFileHandler.insert(line, "TEXT");
-						line = "flds bss_tmp";
+					} else {
+						if(operand_a.get("type").equals("ARRAY_ITEM")) {
+							throw new Exception("* not support array operation yet!");
+						} else if(operand_a.get("type").equals("VARIABLE")) {						
+							String line = "	lwz 9," + operand_a.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");							
+						} else if(operand_a.get("type").equals("CONSTANT")) {
+							String line = "	li 9," + operand_a.get("operand");
+							assFileHandler.insert(line, "TEXT");
+						}
+						
+						if(operand_b.get("type").equals("ARRAY_ITEM")) {
+							throw new Exception("not support array operation yet!");
+						} else if(operand_b.get("type").equals("VARIABLE")) {
+							String line = "	lwz 0," + operand_b.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");
+							line = "	mullw 0,9,0";
+							assFileHandler.insert(line, "TEXT");
+						} else if(operand_b.get("type").equals("CONSTANT")) {
+							String line = "	li 0," + operand_b.get("operand");
+							assFileHandler.insert(line, "TEXT");
+							line = "	mullw 0,9,0";
+							assFileHandler.insert(line, "TEXT");
+						}
+						
+						// 赋值给临时操作数
+						String line = "	stw 0,bss_tmp(31)";
 						assFileHandler.insert(line, "TEXT");
 						// 计算结果压栈
 						Map<String, String> tmpMap = new HashMap<>();
 						tmpMap.put("type", "VARIABLE");
 						tmpMap.put("operand", "bss_tmp");
-						operandStack.push(tmpMap);
+						operandStack.add(tmpMap);
 						// 记录到符号表中
 						tmpMap = new HashMap<>();
 						tmpMap.put("type", "IDENTIFIER");
-						tmpMap.put("field_type", "float");
-						symbolTable.put("bss_tmp",tmpMap);
-					} else {
-						throw new Exception("other div not supported yet");
+						tmpMap.put("field_type", "int");
+						symbolTable.put("bss_tmp", tmpMap);
 					}
+				// 整数除法
+				} else if(operator.equals("/")) {
+					if(containFloat) {
+						
+						throw new Exception("div not supported float yet");
+						
+					} else {
+						if(operand_a.get("type").equals("ARRAY_ITEM")) {
+							throw new Exception("not support array operation yet!");
+						} else if(operand_a.get("type").equals("VARIABLE")) {						
+							String line = "	lwz 9," + operand_a.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");							
+						} else if(operand_a.get("type").equals("CONSTANT")) {
+							String line = "	li 9," + operand_a.get("operand");
+							assFileHandler.insert(line, "TEXT");
+						}
+						
+						if(operand_b.get("type").equals("ARRAY_ITEM")) {
+							throw new Exception("not support array operation yet!");
+						} else if(operand_b.get("type").equals("VARIABLE")) {
+							String line = "	lwz 0," + operand_b.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");
+							line = "	divw 0,9,0";
+							assFileHandler.insert(line, "TEXT");
+						} else if(operand_b.get("type").equals("CONSTANT")) {
+							String line = "	li 0," + operand_b.get("operand");
+							assFileHandler.insert(line, "TEXT");
+							line = "	divw 0,9,0";
+							assFileHandler.insert(line, "TEXT");
+						}
+						
+						// 赋值给临时操作数
+						String line = "	stw 0,bss_tmp(31)";
+						assFileHandler.insert(line, "TEXT");
+						// 计算结果压栈
+						Map<String, String> tmpMap = new HashMap<>();
+						tmpMap.put("type", "VARIABLE");
+						tmpMap.put("operand", "bss_tmp");
+						operandStack.add(tmpMap);
+						// 记录到符号表中
+						tmpMap = new HashMap<>();
+						tmpMap.put("type", "IDENTIFIER");
+						tmpMap.put("field_type", "int");
+						symbolTable.put("bss_tmp", tmpMap);
+					}
+				// 取余运算
+				} else if(operator.equals("%")) {
+					if(operand_a.get("type").equals("ARRAY_ITEM")) {
+						throw new Exception("not support array operation yet!");
+					} else if(operand_a.get("type").equals("VARIABLE")) {						
+						String line = "	lwz 9," + operand_a.get("operand") + "(31)";
+						assFileHandler.insert(line, "TEXT");							
+					} else if(operand_a.get("type").equals("CONSTANT")) {
+						String line = "	li 9," + operand_a.get("operand");
+						assFileHandler.insert(line, "TEXT");
+					}
+					
+					if(operand_b.get("type").equals("ARRAY_ITEM")) {
+						throw new Exception("not support array operation yet!");
+					} else if(operand_b.get("type").equals("VARIABLE")) {
+						String line = "	lwz 11," + operand_b.get("operand") + "(31)";
+						assFileHandler.insert(line, "TEXT");
+						line = "	divw 0,11,9";
+						assFileHandler.insert(line, "TEXT");
+						line = "	mullw 0,9,0";
+						assFileHandler.insert(line, "TEXT");
+						line = "	subf 0,0,11";
+						assFileHandler.insert(line, "TEXT");
+					} else if(operand_b.get("type").equals("CONSTANT")) {
+						String line = "li 11," + operand_b.get("operand");
+						assFileHandler.insert(line, "TEXT");
+						line = "	divw 0,11,9";
+						assFileHandler.insert(line, "TEXT");
+						line = "	mullw 0,9,0";
+						assFileHandler.insert(line, "TEXT");
+						line = "	subf 0,0,11";
+						assFileHandler.insert(line, "TEXT");
+					}
+					
+					// 赋值给临时操作数
+					String line = "	stw 0,bss_tmp(31)";
+					assFileHandler.insert(line, "TEXT");
+					// 计算结果压栈
+					Map<String, String> tmpMap = new HashMap<>();
+					tmpMap.put("type", "VARIABLE");
+					tmpMap.put("operand", "bss_tmp");
+					operandStack.add(tmpMap);
+					// 记录到符号表中
+					tmpMap = new HashMap<>();
+					tmpMap.put("type", "IDENTIFIER");
+					tmpMap.put("field_type", "int");
+					symbolTable.put("bss_tmp", tmpMap);
 				} else if(operator.equals(">=")) {
 					if(containFloat) {
-						if(_isFloat(operand_a)) {
-							if(operand_a.get("type").equals("VARIABLE")) {
-								String line = _isFloat(operand_a) ? "flds " : "filds ";
-								line += operand_a.get("operand");
-								assFileHandler.insert(line, "TEXT");
-							} else {
-								throw new Exception("array item not supported when >=");
-							}
-						} else {
-							// ..
-						}
 						
-						if(_isFloat(operand_b)) {
-							if(operand_b.get("type").equals("VARIABLE")) {
-								String line = "fcom " + operand_b.get("operand");
-								assFileHandler.insert(line, "TEXT");
-							} else {
-								throw new Exception("array item not supported when >=");
-							}
-						} else {
-							if(operand_b.get("type").equals("CONSTANT")) {
-								String line = "movl $" + operand_b.get("operand") + ", bss_tmp";
-								assFileHandler.insert(line, "TEXT");
-								line = "fcom bss_tmp";
-								assFileHandler.insert(line, "TEXT");
-								line = operatorMap.get(">=") + " " + labelsIfelse.get("label_else");
-								assFileHandler.insert(line, "TEXT");
-							} else {
-								// ..
-							}
-						}
+						throw new Exception("<= not support float");
 						
 					} else {
-						// ..
+						// int type
+						if(operand_a.get("type").equals("ARRAY_ITEM")) {
+							throw new Exception("not support array operation yet!");
+						} else if(operand_a.get("type").equals("VARIABLE")) {						
+							String line = "	lwz 0," + operand_a.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");							
+						} else if(operand_a.get("type").equals("CONSTANT")) {
+							String line = "	li 0," + operand_a.get("operand");
+							assFileHandler.insert(line, "TEXT");
+						}
+						
+						if(operand_b.get("type").equals("ARRAY_ITEM")) {
+							throw new Exception("not support array operation yet!");
+						} else if(operand_b.get("type").equals("VARIABLE")) {
+							String line = "	lwz 9," + operand_b.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");
+						} else if(operand_b.get("type").equals("CONSTANT")) {
+							String line = "	li 9," + operand_b.get("operand");
+							assFileHandler.insert(line, "TEXT");
+						}
+						
+						String line = "	cmp 28,0,0,9";
+						assFileHandler.insert(line, "TEXT");
+						line = "	li 0,0";
+						assFileHandler.insert(line, "TEXT");
+						line = "	li 9,1";
+						assFileHandler.insert(line, "TEXT");
+						line = "	isel 0,9,0,28";
+						assFileHandler.insert(line, "TEXT");
+						// 赋值给临时操作数
+						line = "	stw 0,bss_tmp(31)";
+						assFileHandler.insert(line, "TEXT");
+						// 计算结果压栈
+						Map<String, String> tmpMap = new HashMap<>();
+						tmpMap.put("type", "VARIABLE");
+						tmpMap.put("operand", "bss_tmp");
+						operandStack.add(tmpMap);
+						// 记录到符号表中
+						tmpMap = new HashMap<>();
+						tmpMap.put("type", "IDENTIFIER");
+						tmpMap.put("field_type", "int");
+						symbolTable.put("bss_tmp", tmpMap);
 					}
 				} else if(operator.equals("<")) {
 					if(containFloat) {
-						// ..
+						
+						throw new Exception("Sorry, < not support float type");
+						
 					} else {
-						String line = operand_a.get("type").equals("CONSTANT") ? "movl $" : "movl ";
-						line += operand_a.get("operand") + ", %edi";
-						assFileHandler.insert(line, "TEXT");
+//						String line = operand_a.get("type").equals("CONSTANT") ? "movl $" : "movl ";
+//						line += operand_a.get("operand") + ", %edi";
+//						assFileHandler.insert(line, "TEXT");
+//						
+//						line = operand_b.get("type").equals("CONSTANT") ? "movl $" : "movl ";
+//						line += operand_b.get("operand") + ", %esi";
+//						assFileHandler.insert(line, "TEXT");
+//						
+//						line = "cmpl %esi, %edi";
+//						assFileHandler.insert(line, "TEXT");
+//						
+//						line = operatorMap.get("<") + " " + "label_" + labelCnt;
+//						assFileHandler.insert(line, "TEXT");
+
 						
-						line = operand_b.get("type").equals("CONSTANT") ? "movl $" : "movl ";
-						line += operand_b.get("operand") + ", %esi";
-						assFileHandler.insert(line, "TEXT");
+						if(operand_a.get("type").equals("ARRAY_ITEM")) {
+							throw new Exception("not support array operation yet!");
+						} else if(operand_a.get("type").equals("VARIABLE")) {						
+							String line = "	lwz 0," + operand_a.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");							
+						} else if(operand_a.get("type").equals("CONSTANT")) {
+							String line = "	li 0," + operand_a.get("operand");
+							assFileHandler.insert(line, "TEXT");
+						}
 						
-						line = "cmpl %esi, %edi";
-						assFileHandler.insert(line, "TEXT");
+						if(operand_b.get("type").equals("ARRAY_ITEM")) {
+							throw new Exception("not support array operation yet!");
+						} else if(operand_b.get("type").equals("VARIABLE")) {
+							String line = "	lwz 9," + operand_b.get("operand") + "(31)";
+							assFileHandler.insert(line, "TEXT");
+						} else if(operand_b.get("type").equals("CONSTANT")) {
+							String line = "	li 9," + operand_b.get("operand");
+							assFileHandler.insert(line, "TEXT");
+						}
 						
-						line = operatorMap.get("<") + " " + "label_" + labelCnt;
+						String line = "	cmp 28,0,0,9";
 						assFileHandler.insert(line, "TEXT");
+//						line = "	li 0,0";
+//						assFileHandler.insert(line, "TEXT");
+//						line = "	li 9,1";
+//						assFileHandler.insert(line, "TEXT");
+//						line = "	isel 0,9,0,28";
+//						assFileHandler.insert(line, "TEXT");
+						// 赋值给临时操作数
+						line = "	stw 0,relational_tmp(31)";
+						assFileHandler.insert(line, "TEXT");
+						// 计算结果压栈
+						Map<String, String> tmpMap = new HashMap<>();
+						tmpMap.put("type", "VARIABLE");
+						tmpMap.put("operand", "bss_tmp");
+						operandStack.add(tmpMap);
+						// 记录到符号表中
+						tmpMap = new HashMap<>();
+						tmpMap.put("type", "IDENTIFIER");
+						tmpMap.put("field_type", "int");
+						symbolTable.put("bss_tmp", tmpMap);
 					}
 				}
 				
 			} else if(singleOperators.contains(operator)) {
 				Map<String, String> operand = operandStack.pop();
 				if(operator.equals("++")) {
-					String line = "incl " + operand.get("operand");
+//					String line = "incl " + operand.get("operand");
+//					assFileHandler.insert(line, "TEXT");
+					
+					String line = "	lwz 0," + operand.get("operand") + "(31)";
 					assFileHandler.insert(line, "TEXT");
+					line = "	addic 0,0,1";
+					assFileHandler.insert(line, "TEXT");
+					line = "	stw 0," + operand.get("operand")  + "(31)";
+					assFileHandler.insert(line, "TEXT");
+					
 				} else if(operator.equals("--")) {
-					// ..
+					String line = "	lwz 0," + operand.get("operand") + "(31)";
+					assFileHandler.insert(line, "TEXT");
+					line = "	addic 0,0,-1";
+					assFileHandler.insert(line, "TEXT");
+					line = "	stw 0," + operand.get("operand")  + "(31)";
+					assFileHandler.insert(line, "TEXT");
+				} else {
+					throw new Exception("Only suport ++ and -- singleOperator");
 				}
 			} else {
-				throw new Exception("operator not supported");
+				throw new Exception("other operator not support int expression");
 			}
+			assFileHandler.insert("", "TEXT");	// 增加一个空行
 		}
 		Map<String, String> result = new HashMap<>();
 		if(!operandStack.empty()) {
@@ -842,7 +1031,8 @@ public class Assembler {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String src = "src/input/source.c";
+		String src = "src/input/sum.c";
+		String filename = src.substring(src.lastIndexOf("/") + 1);
 		Lexer lexer = new Lexer(Lexer.getContent(src));
 		lexer.runLexer();
 		List<Token> tokens = lexer.getTokens();
@@ -859,6 +1049,6 @@ public class Assembler {
 		Assembler assembler = new Assembler(parser.getTree());
 		assembler.traverse(assembler.getTree().getRoot());
 		src = "src/output/assembler.txt";
-		assembler.getAssFileHandler().generateAssFile(src);
+		assembler.getAssFileHandler().generateAssFile(src, filename);
 	}
 }
