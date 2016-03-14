@@ -1,4 +1,4 @@
-	.file	"sum.c"
+	.file	"sum_while.c"
 	.section .rodata
 	.align 2
 .LC0:
@@ -27,6 +27,10 @@ main:
 	stw 0,tmp(31)
 
 	li 0,1
+	stw 0,i(31)
+
+	lwz 0,i(31)
+	addic 0,0,1
 	stw 0,i(31)
 
 	b .L1

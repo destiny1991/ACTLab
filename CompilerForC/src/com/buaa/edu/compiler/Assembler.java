@@ -475,7 +475,37 @@ public class Assembler {
 	
 	// while语句
 	private void _controlWhile(SyntaxTreeNode node) throws Exception {
-		throw new Exception("while not supported yet");
+		SyntaxTreeNode currentNode = node.getFirstSon();
+		SyntaxTreeNode whileCondition = null;
+		while(null != currentNode) {
+			// while第一部分
+			if(currentNode.getValue().equals("Expression")) {
+				String label = ".L" + labelCnt;
+				labelCnt++;
+				String line = "	b " + label;
+				assFileHandler.insert(line, "TEXT");
+				label = ".L" + labelCnt;
+				labelCnt++;
+				line = label + ":";
+				assFileHandler.insert(line, "TEXT");
+				whileCondition = currentNode;
+				//_expression(currentNode);
+			// while循环体
+			} else if(currentNode.getValue().equals("Sentence")) {
+				traverse(currentNode.getFirstSon());
+			}
+			currentNode = currentNode.getRight();
+		}
+		String line = ".L" + (labelCnt - 2);
+		assFileHandler.insert(line, "TEXT");
+		if(whileCondition != null) _expression(whileCondition);
+		line = "	lwz 0,relational_tmp(31)";
+		assFileHandler.insert(line, "TEXT");
+		line = "	cmpi 7,0,0,0";
+		assFileHandler.insert(line, "TEXT");
+		line = "	bc	12,29," + ".L" + (labelCnt - 1);
+		assFileHandler.insert(line, "TEXT");
+		assFileHandler.insert("", "TEXT");	// 增加一个空行
 	}
 	
 	// return语句
@@ -1031,7 +1061,7 @@ public class Assembler {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String src = "src/input/sum.c";
+		String src = "src/input/sum_while.c";
 		String filename = src.substring(src.lastIndexOf("/") + 1);
 		Lexer lexer = new Lexer(Lexer.getContent(src));
 		lexer.runLexer();

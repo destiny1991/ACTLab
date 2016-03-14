@@ -254,7 +254,8 @@ public class Parser {
 			} else if(tokens.get(index).getType().equals("IDENTIFIER")) {
 				// 变量
 				if(isOperator(tokens.get(index + 1).getValue()) 
-						|| tokens.get(index + 1).getType().equals("SEMICOLON")) {
+						|| tokens.get(index + 1).getType().equals("SEMICOLON")
+						|| tokens.get(index + 1).getType().equals("RL_BRACKET")) {
 					SyntaxTree tmpTree = new SyntaxTree();
 					tmpTree.setRoot(new SyntaxTreeNode("Expression", "Variable", null));
 					tmpTree.setCurrent(tmpTree.getRoot());
@@ -424,13 +425,14 @@ public class Parser {
 		
 		index++;
 		if(tokens.get(index).getType().equals("LL_BRACKET")) {
+			index++;
 			int tmpIndex = index;
 			while(!tokens.get(tmpIndex).getType().equals("RL_BRACKET")) {
 				tmpIndex++;
 			}
 			_expression(whileTree.getRoot(), tmpIndex);
-			
-			if(tokens.get(tmpIndex).getType().equals("LB_BRACKET")) {
+			index++;
+			if(tokens.get(index).getType().equals("LB_BRACKET")) {
 				_block(whileTree);
 			}
 		}
@@ -497,7 +499,6 @@ public class Parser {
 		// 标记for语句是否结束
 		while(true) {
 			String tokenType = tokens.get(index).getType();
-			System.out.println(tokenType);
 			
 			// for标记
 			if(tokenType.equals("FOR")) {
@@ -532,7 +533,6 @@ public class Parser {
 	// 处理控制语句
 	private void _control(SyntaxTreeNode father) throws Exception {
 		String tokenType = tokens.get(index).getType();
-		System.out.println(tokenType);
 		if(tokenType.equals("WHILE") || tokenType.equals("DO")) {
 			_while(father);
 		} else if(tokenType.equals("IF")) {
@@ -554,9 +554,6 @@ public class Parser {
 		
 		while(true) {
 			String sentencePattern = judgeSentencePattern();
-			
-			System.out.println(sentencePattern);
-			
 			// 声明语句
 			if(sentencePattern.equals("STATEMENT")) {
 				_statement(sentenceTree.getRoot());
@@ -572,6 +569,10 @@ public class Parser {
 			// return语句
 			} else if(sentencePattern.equals("RETURN")) {
 				_return(sentenceTree.getRoot());
+			// 自增或自减运算
+			} else if(sentencePattern.equals("SELF_OPT")) {
+				_expression(sentenceTree.getRoot(), null);
+				index++;
 			// 右大括号，函数结束
 			} else if(sentencePattern.equals("RB_BRACKET")) {
 				break;
@@ -594,9 +595,6 @@ public class Parser {
 		// 函数声明语句什么时候结束
 		boolean flag = true;
 		while(flag && index < tokens.size()) {
-			
-			System.out.println(tokens.get(index).getValue());
-			
 			// 如果是函数返回类型
 			if(isDataType(tokens.get(index).getValue())) {
 				SyntaxTreeNode returnType = new SyntaxTreeNode("Type");
@@ -734,13 +732,15 @@ public class Parser {
 			} else {
 				return "ERROR";
 			}
-		// 可能为函数调用或者赋值语句	
+		// 可能为函数调用或者赋值语句或单目运算	
 		} else if(tokenType.equals("IDENTIFIER")) {
 			String index1TokenType = tokens.get(index + 1).getType();
 			if(index1TokenType.equals("LL_BRACKET")) {
 				return "FUNCTION_CALL";
 			} else if(index1TokenType.equals("ASSIGN")) {
 				return "ASSIGNMENT";
+			} else if(index1TokenType.equals("SELF_PLUS") || index1TokenType.equals("SELF_MINUS")) { 
+				return "SELF_OPT";
 			} else {
 				return "ERROR";
 			}
@@ -762,10 +762,7 @@ public class Parser {
 		tree.setCurrent(tree.getRoot());
 		
 		while(index < tokens.size()) {
-			String sentencePattern = judgeSentencePattern();
-			
-			System.out.println(sentencePattern);
-			
+			String sentencePattern = judgeSentencePattern();			
 			// 如果是include句型
 			if(sentencePattern.equals("INCLUDE")) {
 				_include(null);
@@ -814,7 +811,7 @@ public class Parser {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String src = "src/input/source.c";
+		String src = "src/input/sum_while.c";
 		Lexer lexer = new Lexer(Lexer.getContent(src));
 		lexer.runLexer();
 		List<Token> tokens = lexer.getTokens();
