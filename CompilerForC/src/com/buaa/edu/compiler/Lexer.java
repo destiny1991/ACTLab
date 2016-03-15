@@ -169,7 +169,7 @@ public class Lexer {
 					i = skipBlank(i + 1);
 				}
 			} else {
-				throw new Exception("Unrecognized symbol");
+				throw new Exception("Unrecognized symbol : " + content.charAt(i));
 			}
 		}
 	}

@@ -14,7 +14,12 @@ int main() {
         sum = sum + i;
         i++;
     }
-    printf("sum is %d", sum);
+    
+    if(sum > n) {
+    	printf("sum %d is bigger than n %d", n, sum);
+    } else {
+    	printf("less!");
+    }
 
     return 0;
 }

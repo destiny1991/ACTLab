@@ -78,15 +78,6 @@ public class Parser {
 		return false;
 	}
 	
-	// 判断是否包含在指定的容器中
-	private boolean isContain(String[] strs, String word) {
-		for(String str : strs) {
-			if(str.equals(word)) 
-				return true;
-		}
-		return false;
-	}
-	
 	// include句型
 	private void _include(SyntaxTreeNode father) {
 		if(null == father) father = tree.getRoot();
@@ -228,7 +219,7 @@ public class Parser {
 			{
 				put(">", 0); put("<", 0); put(">=", 0); put("<=", 0);
 				put("+", 1); put("-", 1);
-				put("*", 2); put("/", 2);
+				put("*", 2); put("/", 2); put("%", 2);
 				put("++", 3); put("--", 3); put("!", 3);
 			}
 		};
@@ -293,22 +284,46 @@ public class Parser {
 				tmpTree.setCurrent(tmpTree.getRoot());
 				tmpTree.addChildNode(
 						new SyntaxTreeNode(tokens.get(index).getValue(), "_Operator", null), null);
-				
+								
 				// 如果是左括号，直接压栈
 				if(tokens.get(index).getType().equals("LL_BRACKET")) {
 					operatorStack.push(tmpTree);
 				// 如果是右括号，弹栈直到遇到左括号为止
 				} else if(tokens.get(index).getType().equals("RL_BRACKET")) {
-					while(!operatorStack.empty() && !operatorStack.peek().getCurrent().getType().equals("LL_BRACKET")) {
+//					System.out.println(tokens.get(index).getType());
+//					
+//					System.out.println("begin");
+//					for(SyntaxTree item : reversePolishExpression) {
+//						System.out.print(item.getCurrent().getValue() + " ");
+//					}
+//					System.out.println();
+//					for(int i = 0; i < operatorStack.size(); i++) {
+//						System.out.println(operatorStack.get(i).getCurrent().getValue());
+//					}
+//					System.out.println();
+					
+					while(!operatorStack.empty() && !operatorStack.peek().getCurrent().getValue().equals("(")) {
+//						System.out.println("type : " + operatorStack.peek().getCurrent().getType() + " " + operatorStack.peek().getCurrent().getValue());
 						reversePolishExpression.add(operatorStack.pop());
 					}
 					// 将左括号弹出来
 					if(!operatorStack.empty()) operatorStack.pop();
+					
+//					System.out.println("end");
+//					for(SyntaxTree item : reversePolishExpression) {
+//						System.out.print(item.getCurrent().getValue() + " ");
+//					}
+//					System.out.println();
 				// 其他只能是运算符
 				} else {
-					while(!operatorStack.empty() 
+					if(!operatorStack.empty()) {
+						System.out.println(operatorStack.peek().getCurrent().getValue() + " " + tmpTree.getCurrent().getValue());
+					}
+					
+					while(!operatorStack.empty() && !operatorStack.peek().getCurrent().getValue().equals("(")
 							&& operatorPriority.get(tmpTree.getCurrent().getValue()) 
 									< operatorPriority.get(operatorStack.peek().getCurrent().getValue())) {
+						System.out.println("hehe : " + operatorStack.get(0).getCurrent().getValue() + " " + operatorStack.peek().getCurrent().getValue() + " " + tmpTree.getCurrent().getValue());
 						reversePolishExpression.add(operatorStack.pop());
 					}
 					operatorStack.add(tmpTree);
@@ -322,48 +337,20 @@ public class Parser {
 			reversePolishExpression.add(operatorStack.pop());
 		}
 		
-		// 操作数栈
-		Stack<SyntaxTree> operandStack = new Stack<SyntaxTree>();
-		String[][] childOperators = {
-						{"!", "++", "--"},
-						{"+", "-", "*", "/", ">", "<", ">=", "<="}
-				};
-		
+		System.out.print("rp : ");
 		for(SyntaxTree item : reversePolishExpression) {
-			if(!item.getRoot().getType().equals("Operator")) {
-				operandStack.push(item);
-			} else {
-				// 处理单目运算符
-				if(isContain(childOperators[0], item.getCurrent().getValue())) {
-					SyntaxTree a = operandStack.pop();
-					SyntaxTree newTree = new SyntaxTree();
-					newTree.setRoot(new SyntaxTreeNode("Expression", "SingleOperand", null));
-					newTree.setCurrent(newTree.getRoot());
-					// 添加操作符
-					newTree.addChildNode(item.getRoot(), null);
-					// 添加操作数
-					newTree.addChildNode(a.getRoot(), newTree.getRoot());
-					operandStack.push(newTree);
-				// 双目运算符
-				} else if(isContain(childOperators[1], item.getCurrent().getValue())) {
-					SyntaxTree b = operandStack.pop();
-					SyntaxTree a = operandStack.pop();
-					SyntaxTree newTree = new SyntaxTree();
-					newTree.setRoot(new SyntaxTreeNode("Expression", "DoubleOperand", null));
-					newTree.setCurrent(newTree.getRoot());
-					// 第一个操作数
-					newTree.addChildNode(a.getRoot(), null);
-					// 操作符
-					newTree.addChildNode(item.getRoot(), newTree.getRoot());
-					// 第二个操作数
-					newTree.addChildNode(b.getRoot(), newTree.getRoot());
-					operandStack.push(newTree);
-				} else {
-					throw new Exception("operator " + item.getCurrent().getValue() + " is not supported!");
-				}
-			}
+			System.out.print(item.getCurrent().getValue() + " ");
 		}
-		tree.addChildNode(operandStack.get(0).getRoot(), father);
+		System.out.println();
+		
+		// 把逆波兰表达式存入语法树
+		SyntaxTree newTree = new SyntaxTree();
+		newTree.setRoot(new SyntaxTreeNode("Expression", "SingleOrDoubleOperand", null));
+		newTree.setCurrent(newTree.getRoot());
+		for(SyntaxTree item : reversePolishExpression) {
+			newTree.addChildNode(item.getRoot(), newTree.getRoot());
+		}
+		tree.addChildNode(newTree.getRoot(), father);
 	}
 	
 	// 赋值语句
@@ -577,7 +564,7 @@ public class Parser {
 			} else if(sentencePattern.equals("RB_BRACKET")) {
 				break;
 			} else {
-				throw new Exception("Block Error");
+				throw new Exception("Block Error : " + sentencePattern);
 			}
 		}
 		
@@ -752,7 +739,7 @@ public class Parser {
 			index++;
 			return "RB_BRACKET";
 		} else {
-			return "ERROR";
+			return "ERROR : " + tokenType;
 		}
 	}
 	
@@ -811,7 +798,7 @@ public class Parser {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String src = "src/input/sum_while.c";
+		String src = "src/input/if.c";
 		Lexer lexer = new Lexer(Lexer.getContent(src));
 		lexer.runLexer();
 		List<Token> tokens = lexer.getTokens();

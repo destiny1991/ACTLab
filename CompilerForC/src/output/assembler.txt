@@ -1,11 +1,5 @@
-	.file	"sum_while.c"
+	.file	"if.c"
 	.section .rodata
-	.align 2
-.LC0:
-	.string	"%d:"
-	.align 2
-.LC3:
-	.string	"sum is %d:"
 	.section ".text"
 	.align 2
 	.globl main
@@ -15,54 +9,45 @@ main:
 	stw 31,12(1)
 	mr 31,1
 
-	lis 0,.LC0@ha
-	addic 10,0,.LC0@l
-	mr 3,10
-	addi 11,31,n
-	mr 4,11
-	crxor 6,6,6
-	bl __isoc99_scanf
+	lwz 9,i(31)
+	lwz 0,j(31)
+	subf 0,9,0
+	stw 0,bss_tmp1(31)
 
-	lwz 0,n(31)
-	stw 0,tmp(31)
+	lwz 9,k(31)
+	lwz 0,p(31)
+	subf 0,9,0
+	stw 0,bss_tmp2(31)
 
-	li 0,1
-	stw 0,i(31)
-
-	lwz 0,i(31)
-	addic 0,0,1
-	stw 0,i(31)
-
-	b .L1
-.L2:
-	lwz 9,sum(31)
-	lwz 0,i(31)
+	lwz 9,k(31)
+	lwz 0,j(31)
 	add 0,9,0
-	stw 0,bss_tmp(31)
+	stw 0,bss_tmp3(31)
 
-	lwz 0,bss_tmp(31)
-	stw 0,sum(31)
+	lwz 9,i(31)
+	lwz 0,bss_tmp3(31)
+	subf 0,9,0
+	stw 0,bss_tmp4(31)
+
+	lwz 9,bss_tmp2(31)
+	lwz 0,bss_tmp4(31)
+	add 0,9,0
+	stw 0,bss_tmp5(31)
+
+	lwz 9,bss_tmp1(31)
+	lwz 0,bss_tmp5(31)
+	mullw 0,9,0
+	stw 0,bss_tmp6(31)
+
+	lwz 0,bss_tmp6(31)
+	stw 0,z(31)
 
 	lwz 0,i(31)
 	addic 0,0,1
 	stw 0,i(31)
 
-.L1
 	lwz 0,i(31)
-	lwz 9,n(31)
-	cmp 28,0,0,9
-	stw 0,relational_tmp(31)
-
-	lwz 0,relational_tmp(31)
-	cmpi 7,0,0,0
-	bc	12,29,.L2
-
-	lis 0,.LC3@ha
-	addic 0,0,.LC3@l
-	mr 3,0
-	lwz 4,sum(31)
-	crxor 6,6,6
-	bl printf
+	stw 0,z(31)
 
 	li 0,0
 	mr 3,0

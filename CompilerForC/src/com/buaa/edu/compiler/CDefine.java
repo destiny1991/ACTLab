@@ -28,8 +28,8 @@ public class CDefine {
 			
 			put("#", "SHARP"); put("=", "ASSIGN"); put("&", "ADDRESS"); put(",", "COMMA");
 			put("<", "LT"); put(">", "GT"); put(">=", "GET"); put("<=", "LET");
-			put("+", "PLUS"); put("-", "MINUS"); put("*", "MUL"); put("/", "DIV"); 
-			put("++", "SELF_PLUS"); put("--", "SELF_MINUS");  put("\"", "DOUBLE_QUOTE");put(";", "SEMICOLON");
+			put("+", "PLUS"); put("-", "MINUS"); put("*", "MUL"); put("/", "DIV"); put("%", "MOD");
+			put("++", "SELF_PLUS"); put("--", "SELF_MINUS");  put("\"", "DOUBLE_QUOTE"); put(";", "SEMICOLON");
 			put("(", "LL_BRACKET"); put(")", "RL_BRACKET"); put("{", "LB_BRACKET"); put("}", "RB_BRACKET");
 			put("[", "LM_BRACKET"); put("]", "RM_BRACKET"); 
 		}
@@ -44,7 +44,7 @@ public class CDefine {
 
 	// 运算符
 	public static String[] operators = {
-			"=", "&", "<", ">", "++", "--", "+", "-", "*", "/", ">=", "<=", "!="
+			"=", "&", "<", ">", "++", "--", "+", "-", "*", "/", "%", ">=", "<=", "!="
 	};
 	
 	// 分隔符
