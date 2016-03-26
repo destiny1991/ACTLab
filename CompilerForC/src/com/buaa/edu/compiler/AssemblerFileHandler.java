@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 维护生成的汇编文件
@@ -56,6 +57,17 @@ public class AssemblerFileHandler {
 		}
 		writer.write("	.ident	\"powerpc-e500v2-linux-gnuspe-gcc\"");
 		writer.newLine();
+		writer.close();
+	}
+	
+	// 将符号表中的内容保存到文件
+	public void generateSymbolTableFile(String src, Map<String, Map<String, String>> symbolTable) throws IOException  {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(src));
+		for(String variableName : symbolTable.keySet()) {
+			Map<String, String> value = symbolTable.get(variableName);
+			writer.write(variableName + " " + value.get("register"));
+			writer.newLine();
+		}
 		writer.close();
 	}
 }

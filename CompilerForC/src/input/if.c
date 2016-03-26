@@ -7,9 +7,12 @@ int main() {
 	int p;
 	int z;
 	
-	z = (i - j) * ((k - p) + i - (k + j));
-	
-	z = i++;
+	scanf("%d %d", &i, &j);
+	if(i < j) {
+		printf("%d < %d", i, j);
+	} else {
+		printf("%d >= %d", i, j);
+	}
 
 	return 0;
 }

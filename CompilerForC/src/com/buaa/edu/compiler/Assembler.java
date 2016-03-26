@@ -21,11 +21,11 @@ public class Assembler {
 	private Stack<Map<String, String>> optAndOpdStack;
 	private int labelCnt;							// 已经声明了多少个label
 	private int memAdress;							// 已经使用了多少个相对地址
-	private Map<String, String> labelsIfelse;		// ifelse中的标签
+	
 	
 	// 控制生成的汇编代码中，变量是以数字还是原始名称出现
 	// 默认false，为原始名称出现
-	private boolean isVariableSymbolOrNumber = true;
+	private boolean isVariableSymbolOrNumber = false;
 	
 	public Assembler(SyntaxTree tree) {
 		super();
@@ -46,7 +46,7 @@ public class Assembler {
 		optAndOpdStack = new Stack<>();
 		labelCnt = 0;
 		memAdress = 8;			// 以8号地址起始
-		labelsIfelse = new HashMap<>();
+		
 	}
 
 	public SyntaxTree getTree() {
@@ -103,14 +103,6 @@ public class Assembler {
 
 	public void setLabelCnt(int labelCnt) {
 		this.labelCnt = labelCnt;
-	}
-
-	public Map<String, String> getLabelsIfelse() {
-		return labelsIfelse;
-	}
-
-	public void setLabelsIfelse(Map<String, String> labelsIfelse) {
-		this.labelsIfelse = labelsIfelse;
 	}
 	
 	// include句型
@@ -405,9 +397,10 @@ public class Assembler {
 		assFileHandler.insert("", "TEXT");
 	}
 	
-	// if else语句
+	// if-else语句
 	private void _controlIf(SyntaxTreeNode node) throws Exception {
 		SyntaxTreeNode currentNode = node.getFirstSon();
+		Map<String, String> labelsIfelse = new HashMap<>();		// ifelse中的标签
 		labelsIfelse.put("label_else", ".L" + labelCnt);
 		labelCnt++;
 		labelsIfelse.put("label_end", ".L" + labelCnt);
@@ -426,7 +419,7 @@ public class Assembler {
 				assFileHandler.insert(line, "TEXT");
 				line = "	cmpi 7,0,0,0";
 				assFileHandler.insert(line, "TEXT");
-				line = "	bc 4,29," + labelsIfelse.get("label_else");
+				line = "	beq 7," + labelsIfelse.get("label_else");
 				assFileHandler.insert(line, "TEXT");
 				assFileHandler.insert("", "TEXT");	// 插入一个空行
 				traverse(currentNode.getFirstSon().getRight().getFirstSon());
@@ -448,6 +441,12 @@ public class Assembler {
 	// for语句
 	private void _controlFor(SyntaxTreeNode node) throws Exception {
 		SyntaxTreeNode currentNode = node.getFirstSon();
+		Map<String, String> labelsFor = new HashMap<>();
+		labelsFor.put("label1", ".L" + labelCnt);
+		labelCnt++;
+		labelsFor.put("label2", ".L" + labelCnt);
+		labelCnt++;
+		
 		// 遍历的是for循环中的那个部分
 		int cnt = 2;
 		SyntaxTreeNode forCondition = null;
@@ -460,13 +459,9 @@ public class Assembler {
 				// 第2部分
 				if(cnt == 2) {
 					cnt++;
-					String label = ".L" + labelCnt;
-					labelCnt++;
-					String line = "	b " + label;
+					String line = "	b " + labelsFor.get("label1");
 					assFileHandler.insert(line, "TEXT");
-					label = ".L" + labelCnt;
-					labelCnt++;
-					line = label + ":";
+					line = labelsFor.get("label2") + ":";
 					assFileHandler.insert(line, "TEXT");
 					
 					forCondition = currentNode;
@@ -482,7 +477,7 @@ public class Assembler {
 			currentNode = currentNode.getRight();
 		}
 		
-		String line = ".L" + (labelCnt - 2) + ":";
+		String line = labelsFor.get("label1") + ":";
 		assFileHandler.insert(line, "TEXT");
 		Map<String, String> expres =  _expression(forCondition);
 		line = "	lwz 0," 
@@ -490,7 +485,7 @@ public class Assembler {
 		assFileHandler.insert(line, "TEXT");
 		line = "	cmpi 7,0,0,0";
 		assFileHandler.insert(line, "TEXT");
-		line = "	bc	12,29," + ".L" + (labelCnt - 1);
+		line = "	bne 7," + labelsFor.get("label2");		// 不为0
 		assFileHandler.insert(line, "TEXT");
 		assFileHandler.insert("", "TEXT");	// 增加一个空行
 	}
@@ -499,16 +494,18 @@ public class Assembler {
 	private void _controlWhile(SyntaxTreeNode node) throws Exception {
 		SyntaxTreeNode currentNode = node.getFirstSon();
 		SyntaxTreeNode whileCondition = null;
+		Map<String, String> labelsWhile = new HashMap<>();
+		labelsWhile.put("label1", ".L" + labelCnt);
+		labelCnt++;
+		labelsWhile.put("label2", ".L" + labelCnt);
+		labelCnt++;
+		
 		while(null != currentNode) {
 			// while第一部分
 			if(currentNode.getValue().equals("Expression")) {
-				String label = ".L" + labelCnt;
-				labelCnt++;
-				String line = "	b " + label;
+				String line = "	b " + labelsWhile.get("label1");
 				assFileHandler.insert(line, "TEXT");
-				label = ".L" + labelCnt;
-				labelCnt++;
-				line = label + ":";
+				line = labelsWhile.get("label2") + ":";
 				assFileHandler.insert(line, "TEXT");
 				whileCondition = currentNode;
 				//_expression(currentNode);
@@ -516,9 +513,10 @@ public class Assembler {
 			} else if(currentNode.getValue().equals("Sentence")) {
 				traverse(currentNode.getFirstSon());
 			}
+			System.out.println(currentNode.getValue());
 			currentNode = currentNode.getRight();
 		}
-		String line = ".L" + (labelCnt - 2);
+		String line = labelsWhile.get("label1") + ":";
 		assFileHandler.insert(line, "TEXT");
 		Map<String, String> expres =  _expression(whileCondition);
 		line = "	lwz 0," 
@@ -526,7 +524,7 @@ public class Assembler {
 		assFileHandler.insert(line, "TEXT");
 		line = "	cmpi 7,0,0,0";
 		assFileHandler.insert(line, "TEXT");
-		line = "	bc	12,29," + ".L" + (labelCnt - 1);
+		line = "	bne 7," + labelsWhile.get("label2");
 		assFileHandler.insert(line, "TEXT");
 		assFileHandler.insert("", "TEXT");	// 增加一个空行
 	}
@@ -623,7 +621,7 @@ public class Assembler {
 			private static final long serialVersionUID = 1L;
 			{
 				add("+"); add("-"); add("*"); add("/"); add("%");
-				add(">"); add("<"); add(">="); add("<=");
+				add(">"); add("<"); add(">="); add("<="); add("==");
 			}
 		};
 		
@@ -876,34 +874,34 @@ public class Assembler {
 						if(operand_a.get("type").equals("ARRAY_ITEM")) {
 							throw new Exception("not support array operation yet!");
 						} else if(operand_a.get("type").equals("VARIABLE")) {						
-							String line = "	lwz 9," 
+							String line = "	lwz 0," 
 									+ (isVariableSymbolOrNumber ? symbolTable.get(operand_a.get("operand")).get("register") : operand_a.get("operand")) + "(31)";
 							assFileHandler.insert(line, "TEXT");							
 						} else if(operand_a.get("type").equals("CONSTANT")) {
-							String line = "	li 9," + operand_a.get("operand");
+							String line = "	li 0," + operand_a.get("operand");
 							assFileHandler.insert(line, "TEXT");
 						}
 						
 						if(operand_b.get("type").equals("ARRAY_ITEM")) {
 							throw new Exception("not support array operation yet!");
 						} else if(operand_b.get("type").equals("VARIABLE")) {
-							String line = "	lwz 11," 
+							String line = "	lwz 9," 
 									+ (isVariableSymbolOrNumber ? symbolTable.get(operand_b.get("operand")).get("register") : operand_b.get("operand")) + "(31)";
 							assFileHandler.insert(line, "TEXT");
-							line = "	divw 0,11,9";
+							line = "	divw 11,0,9";
 							assFileHandler.insert(line, "TEXT");
-							line = "	mullw 0,9,0";
+							line = "	mullw 9,11,9";
 							assFileHandler.insert(line, "TEXT");
-							line = "	subf 0,0,11";
+							line = "	subf 0,9,0";
 							assFileHandler.insert(line, "TEXT");
 						} else if(operand_b.get("type").equals("CONSTANT")) {
-							String line = "li 11," + operand_b.get("operand");
+							String line = "	li 9," + operand_b.get("operand");
 							assFileHandler.insert(line, "TEXT");
-							line = "	divw 0,11,9";
+							line = "	divw 11,0,9";
 							assFileHandler.insert(line, "TEXT");
-							line = "	mullw 0,9,0";
+							line = "	mullw 9,11,9";
 							assFileHandler.insert(line, "TEXT");
-							line = "	subf 0,0,11";
+							line = "	subf 0,9,0";
 							assFileHandler.insert(line, "TEXT");
 						}
 						// 赋值给临时操作数
@@ -1143,7 +1141,8 @@ public class Assembler {
 							assFileHandler.insert(line, "TEXT");
 							line = "	li 9,1";
 							assFileHandler.insert(line, "TEXT");
-							line = "	isel 0,9,0,28";
+							line = "	isel 0,9,0,28";   // 28   CR7 = CR[28, 29, 30, 31] 
+														  // (cr[crfD] : 有4位 : LT,GT,EQ,SO)
 							assFileHandler.insert(line, "TEXT");
 							
 							// 赋值给临时操作数
@@ -1166,6 +1165,65 @@ public class Assembler {
 							tmpMap.put("operand", bss_tmp);
 							operandStack.push(tmpMap);
 						}
+					} else if(operator.equals("==")) {
+						if(containFloat) {
+							
+							throw new Exception("Sorry, == not support float type");
+						// 只处理整形
+						} else {
+							if(operand_a.get("type").equals("ARRAY_ITEM")) {
+								throw new Exception("not support array operation yet!");
+							} else if(operand_a.get("type").equals("VARIABLE")) {						
+								String line = "	lwz 0," 
+										+ (isVariableSymbolOrNumber ? symbolTable.get(operand_a.get("operand")).get("register") : operand_a.get("operand")) + "(31)";
+								assFileHandler.insert(line, "TEXT");							
+							} else if(operand_a.get("type").equals("CONSTANT")) {
+								String line = "	li 0," + operand_a.get("operand");
+								assFileHandler.insert(line, "TEXT");
+							}
+							
+							if(operand_b.get("type").equals("ARRAY_ITEM")) {
+								throw new Exception("not support array operation yet!");
+							} else if(operand_b.get("type").equals("VARIABLE")) {
+								String line = "	lwz 9," 
+										+ (isVariableSymbolOrNumber ? symbolTable.get(operand_b.get("operand")).get("register") : operand_b.get("operand")) + "(31)";
+								assFileHandler.insert(line, "TEXT");
+							} else if(operand_b.get("type").equals("CONSTANT")) {
+								String line = "	li 9," + operand_b.get("operand");
+								assFileHandler.insert(line, "TEXT");
+							}
+							
+							String line = "	cmp 7,0,0,9";
+							assFileHandler.insert(line, "TEXT");
+							line = "	li 0,0";
+							assFileHandler.insert(line, "TEXT");
+							line = "	li 9,1";
+							assFileHandler.insert(line, "TEXT");
+							line = "	isel 0,9,0,30";
+							assFileHandler.insert(line, "TEXT");
+							
+							// 赋值给临时操作数
+							String bss_tmp = "bss_tmp" + bss_tmp_cnt;
+							bss_tmp_cnt++;
+							// 记录到符号表中
+							Map<String, String> tmpMap = new HashMap<>();
+							tmpMap.put("type", "IDENTIFIER");
+							tmpMap.put("field_type", "int");
+							tmpMap.put("register", Integer.toString(memAdress_tmp));
+							memAdress_tmp += 4;
+							symbolTable.put(bss_tmp, tmpMap);
+							
+							line = "	stw 0," 
+									+ (isVariableSymbolOrNumber ? symbolTable.get(bss_tmp).get("register") : bss_tmp) + "(31)";
+							assFileHandler.insert(line, "TEXT");
+							// 计算结果压栈
+							tmpMap = new HashMap<>();
+							tmpMap.put("type", "VARIABLE");
+							tmpMap.put("operand", bss_tmp);
+							operandStack.push(tmpMap);
+						}
+					} else {
+						throw new Exception("Other doubleOperators not support!");
 					}
 				} else if(singleOperators.contains(operator)) {
 					// 后缀单目运算符运算完后, 把运算前的结果保存在栈中
@@ -1276,7 +1334,7 @@ public class Assembler {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String src = "src/input/sum_for.c";
+		String src = "src/input/evenSum.c";
 		String filename = src.substring(src.lastIndexOf("/") + 1);
 		Lexer lexer = new Lexer(Lexer.getContent(src));
 		lexer.runLexer();
@@ -1295,5 +1353,8 @@ public class Assembler {
 		assembler.traverse(assembler.getTree().getRoot());
 		src = "src/output/assembler.txt";
 		assembler.getAssFileHandler().generateAssFile(src, filename);
+		src = "src/output/symboltable.txt";
+		assembler.getAssFileHandler().generateSymbolTableFile(src, assembler.getSymbolTable());
+		
 	}
 }

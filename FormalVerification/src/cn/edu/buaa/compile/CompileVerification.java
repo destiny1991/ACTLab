@@ -283,7 +283,7 @@ public class CompileVerification {
 
 	public static void main(String[] args) {
 		CompileVerification cv = new CompileVerification();
-		String inputPath = "src/input/arithmetic.txt";
+		String inputPath = "src/input/if.txt";
 		cv.runApp(inputPath);
 	}
 }

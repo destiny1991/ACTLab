@@ -217,7 +217,7 @@ public class Parser {
 		Map<String, Integer> operatorPriority = new HashMap<String, Integer>(){
 			private static final long serialVersionUID = 1L;
 			{
-				put(">", 0); put("<", 0); put(">=", 0); put("<=", 0);
+				put(">", 0); put("<", 0); put(">=", 0); put("<=", 0); put("==", 0);
 				put("+", 1); put("-", 1);
 				put("*", 2); put("/", 2); put("%", 2);
 				put("++", 3); put("--", 3); put("!", 3);
@@ -290,17 +290,6 @@ public class Parser {
 					operatorStack.push(tmpTree);
 				// 如果是右括号，弹栈直到遇到左括号为止
 				} else if(tokens.get(index).getType().equals("RL_BRACKET")) {
-//					System.out.println(tokens.get(index).getType());
-//					
-//					System.out.println("begin");
-//					for(SyntaxTree item : reversePolishExpression) {
-//						System.out.print(item.getCurrent().getValue() + " ");
-//					}
-//					System.out.println();
-//					for(int i = 0; i < operatorStack.size(); i++) {
-//						System.out.println(operatorStack.get(i).getCurrent().getValue());
-//					}
-//					System.out.println();
 					
 					while(!operatorStack.empty() && !operatorStack.peek().getCurrent().getValue().equals("(")) {
 //						System.out.println("type : " + operatorStack.peek().getCurrent().getType() + " " + operatorStack.peek().getCurrent().getValue());
@@ -308,12 +297,6 @@ public class Parser {
 					}
 					// 将左括号弹出来
 					if(!operatorStack.empty()) operatorStack.pop();
-					
-//					System.out.println("end");
-//					for(SyntaxTree item : reversePolishExpression) {
-//						System.out.print(item.getCurrent().getValue() + " ");
-//					}
-//					System.out.println();
 				// 其他只能是运算符
 				} else {
 					if(!operatorStack.empty()) {
@@ -798,7 +781,7 @@ public class Parser {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String src = "src/input/if.c";
+		String src = "src/input/evenSum.c";
 		Lexer lexer = new Lexer(Lexer.getContent(src));
 		lexer.runLexer();
 		List<Token> tokens = lexer.getTokens();

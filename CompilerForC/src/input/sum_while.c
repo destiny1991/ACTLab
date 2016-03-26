@@ -7,19 +7,16 @@ int main() {
 	int tmp;
 	
     scanf("%d", &n);
-    tmp = n;
     i = 1;
-    i++;
     while(i < n) {
-        sum = sum + i;
+    	sum = sum + i;
+        if(sum == 10) {
+        	printf("sum == 10");
+        } else {
+        	printf("else else");
+        }
         i++;
     }
     
-    if(sum > n) {
-    	printf("sum %d is bigger than n %d", n, sum);
-    } else {
-    	printf("less!");
-    }
-
     return 0;
 }

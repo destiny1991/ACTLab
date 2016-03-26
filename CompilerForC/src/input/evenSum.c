@@ -4,12 +4,17 @@ int main() {
     int n;
     int i;
     int sum;
-	int tmp;
+    int tmp;
 	
     scanf("%d", &n);
     sum = 0;
     for(i = 1; i <= n; i++) {
-        sum = sum + i * i;
+    	tmp = i % 2;
+        if(tmp == 0) {
+            sum = sum + i;
+        } else {
+        	sum = sum + 0;
+        }
     }
     printf("sum is %d", sum);
 

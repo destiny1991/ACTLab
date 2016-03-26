@@ -160,7 +160,7 @@ public class Lexer {
 					tokens.add(new Token(3, content.substring(i, i + 2)));
 					i = skipBlank(i + 2);
 				// 如果是>=或者<=
-				} else if((content.charAt(i) == '>' || content.charAt(i) == '<') 
+				} else if((content.charAt(i) == '>' || content.charAt(i) == '<' || content.charAt(i) == '=') 
 						&& content.charAt(i + 1) == '=') {
 					tokens.add(new Token(3, content.charAt(i) + "="));
 					i = skipBlank(i + 2);
@@ -195,7 +195,7 @@ public class Lexer {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String src = "src/input/source.c";
+		String src = "src/input/evenSum.c";
 		Lexer lexer = new Lexer(getContent(src));
 		lexer.runLexer();
 		List<Token> tokens = lexer.getTokens();
