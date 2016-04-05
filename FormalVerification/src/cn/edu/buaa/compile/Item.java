@@ -2,25 +2,26 @@ package cn.edu.buaa.compile;
 
 /**
  * 存储一行指称语义
+ * 
  * @author destiny
  *
  */
 public class Item implements Cloneable {
-	private String premise;		//存储前提
-	private String left;		//存储语句
-	private String right;		
-	
+	private String premise; // 存储前提
+	private String left; // 存储语句
+	private String right;
+
 	public Item() {
 	}
-	
+
 	public Item(String body) {
 		this(null, body, null);
 	}
-	
+
 	public Item(String left, String right) {
 		this(null, left, right);
 	}
-	
+
 	public Item(String premise, String left, String right) {
 		this.premise = premise;
 		this.left = left;
@@ -29,10 +30,10 @@ public class Item implements Cloneable {
 
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		Object obj = super.clone(); 		
+		Object obj = super.clone();
 		return obj;
 	}
-	
+
 	public String getPremise() {
 		return premise;
 	}

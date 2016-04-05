@@ -8,112 +8,158 @@ import java.util.Set;
 
 /**
  * 用来帮助生成指令的相关属性，随着后续更多代码的增加，此文件会不断被修改
+ * 
  * @author destiny
  *
  */
-public class Helper {	
-	public static Map<String, String> generateParas(String[] lines) {
+public class Helper {
+	public static Map<String, String> generateParas(String[] lines) throws Exception {
 		Map<String, String> paras = new HashMap<String, String>();
 		switch (lines[0]) {
-		case "cmpi":			
+		case "cmp":
 			paras.put("crfD", lines[1]);
+			paras.put("L", lines[2]);
+			paras.put("rA", lines[3]);
+			paras.put("rB", lines[4]);
+			break;
+		case "cmpi":
+			paras.put("crfD", lines[1]);
+			paras.put("L", lines[2]);
 			paras.put("rA", lines[3]);
 			paras.put("SIMM", lines[4]);
-			break;
-		case "bc":
-			paras.put("BO", lines[1]);
-			int BI = ((Integer.parseInt(lines[2]))>>2) & 7;
-			paras.put("BI", BI + "");
-			paras.put("BD", lines[3]);
-			paras.put("AA", "0");
-			paras.put("LK", "0");
 			break;
 		case "b":
 			paras.put("LI", lines[1]);
 			paras.put("AA", "0");
 			paras.put("LK", "0");
 			break;
+		case "beq":
+			paras.put("crfD", lines[1]);
+			paras.put("target", lines[2]);
+			break;
+		case "bne":
+			paras.put("crfD", lines[1]);
+			paras.put("target", lines[2]);
+			break;
+		case "li":
+			paras.put("rD", lines[1]);
+			paras.put("SIMM", lines[2]);
+			break;
 		case "lwz":
 			paras.put("rD", lines[1]);
 			paras.put("D", lines[2]);
+			if(lines.length > 3) paras.put("rA", lines[3]);
+			break;
+		case "stw":
+			paras.put("rS", lines[1]);
+			paras.put("D", lines[2]);
 			paras.put("rA", lines[3]);
+			break;
+		case "addi":	// rD,rA,SIMM
+		case "mulli":
+			paras.put("rD", lines[1]);
+			paras.put("rA", lines[2]);
+			paras.put("SIMM", lines[3]);
 			break;
 		case "divw":
 		case "mullw":
 		case "subf":
+		case "add":
 			paras.put("rD", lines[1]);
 			paras.put("rA", lines[2]);
 			paras.put("rB", lines[3]);
 			paras.put("OE", "0");
 			paras.put("Rc", "0");
 			break;
-		default:
+		case "isel":
+			paras.put("rD", lines[1]);
+			paras.put("rA", lines[2]);
+			paras.put("rB", lines[3]);
+			paras.put("crfD", Integer.toString(Integer.parseInt(lines[4]) / 4));
+			paras.put("crb", lines[4]);
 			break;
+		case "xori":
+		case "andi.":
+		case "ori":
+		case "slwi":
+		case "srawi":
+			paras.put("rA", lines[1]);
+			paras.put("rS", lines[2]);
+			paras.put("UIMM", lines[3]);
+			break;
+		case "xor":
+		case "and":
+		case "or":
+		case "slw":
+		case "sraw":
+		case "nor":
+			paras.put("rA", lines[1]);
+			paras.put("rS", lines[2]);
+			paras.put("rB", lines[3]);
+			break;
+		default:
+			throw new Exception("generateParams 中没法找到指令： " + lines[0]);
 		}
 		return paras;
 	}
-		
-	public static void pretreat(List<Item> semanSet, String name, List<Item> ts, 
-			Map<String, String> paras) {
+
+	public static void pretreat(List<Item> semanSet, String name, List<Item> ts, Map<String, String> paras) {
 		Item item = null;
 		switch (name) {
-		case "bc":
-			int bo =  Integer.parseInt(paras.get("BO"));
-			if((bo & 1<<2) > 0 && 0 == (bo & 1<<3)) {
-				item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
-				semanSet.add(item);
-				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
-				semanSet.add(item);
-				item = new Item("CR[BI] = {3'b001, XER.SO}", ts.get(4).getLeft(), ts.get(4).getRight());
-				item.setRight("PC + BD");
-				semanSet.add(item);
-			} else if((bo & 1<<2) > 0 && (bo & 1<<3) > 0) {
-				item = new Item("CR[BI] = {3'b100, XER.SO}", ts.get(5).getLeft(), ts.get(5).getRight());
-				semanSet.add(item);
-				item = new Item("CR[BI] = {3'b010, XER.SO}", ts.get(4).getLeft(), ts.get(4).getRight());
-				item.setRight("PC + BD");
-				semanSet.add(item);
-				item = new Item("CR[BI] = {3'b001, XER.SO}",  ts.get(5).getLeft(), ts.get(5).getRight());
-				semanSet.add(item);
-			}			
+		case "isel":
+			if(paras.get("crb").equals("28")) {
+				Item e = ts.get(0);
+				e.setRight("GPR[rA]");
+				if(paras.get("rA").equals("0")) e.setRight("0");
+				semanSet.add(e);
+				e = ts.get(1);
+				e.setRight("GPR[rB]");
+				semanSet.add(e);
+				e = ts.get(2);
+				e.setRight("GPR[rB]");
+				semanSet.add(e);
+			} else if(paras.get("crb").equals("29")) {
+				Item e = ts.get(0);
+				e.setRight("GPR[rB]");
+				semanSet.add(e);
+				e = ts.get(1);
+				e.setRight("GPR[rA]");
+				if(paras.get("rA").equals("0")) e.setRight("0");
+				semanSet.add(e);
+				e = ts.get(2);
+				e.setRight("GPR[rB]");
+				semanSet.add(e);
+			} else {
+				for (Item e : ts) {
+					try {
+						item = (Item) e.clone();
+						if(paras.get("rA").equals("0")) {
+							if(item.getRight().equals("GPR[rA]")) {
+								item.setRight("0");
+							}
+						}			
+						semanSet.add(item);
+					} catch (CloneNotSupportedException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
 			break;
-		case "cmpi":
-			String simm = paras.get("SIMM");
-			for(Item e : ts) {	
+		case "addi":
+			for (Item e : ts) {
 				try {
 					item = (Item) e.clone();
-					if(simm.equals("0")) {
-						String tmp = item.getPremise().replace("{16{SIMM[16]}, SIMM}", "32{SIMM}");
-						item.setPremise(tmp);
-					}
+					if(paras.get("rA").equals("0") && item.getRight().contains("rA")) {
+						item.setRight("SIMM");
+					}			
 					semanSet.add(item);
 				} catch (CloneNotSupportedException e1) {
 					e1.printStackTrace();
 				}
 			}
 			break;
-		case "b":
-			try {
-				item = (Item) ts.get(0).clone();
-				item.setRight("PC + LI");
-				semanSet.add(item);
-			} catch (CloneNotSupportedException e2) {
-				e2.printStackTrace();
-			}
-			break;
-		case "lwz":
-			int rA = Integer.parseInt(paras.get("rA"));
-			if(0 != rA) rA = 1;
-			for(Item e : ts) {
-				if(e.getPremise().equals("rA = " + rA)) {
-					item = new Item(null, e.getLeft(), e.getRight());
-					semanSet.add(item);
-					return;
-				}
-			}
-			break;
 		default:
-			for(Item e : ts) {	
+			for (Item e : ts) {
 				try {
 					item = (Item) e.clone();
 					semanSet.add(item);
@@ -124,29 +170,31 @@ public class Helper {
 			break;
 		}
 	}
-	
-	public static Semantic generateSemantic(String name, Map<String, String> paras, 
-			Map<String, Semantic> axiomSet) {
+
+	public static Semantic generateSemantic(String name, Map<String, String> paras, Map<String, Semantic> axiomSet) throws Exception {
 		List<Item> semanSet = new ArrayList<Item>();
 		Semantic seman = new Semantic(semanSet);
+		if(!axiomSet.containsKey(name)) {
+			throw new Exception("缺少指称语义：" + name);
+		}
 		List<Item> ts = axiomSet.get(name).getSemanSet();
-		
+
 		pretreat(semanSet, name, ts, paras);
-		
+
 		Set<String> set = paras.keySet();
-		for(String key : set) {
+		for (String key : set) {
 			String value = paras.get(key);
-			for(Item item : seman.getSemanSet()) {
+			for (Item item : seman.getSemanSet()) {
 				String nkey = "\\b" + key + "\\b";
-				if(null != item.getPremise()) {
+				if (null != item.getPremise()) {
 					String tmp = item.getPremise().replaceAll(nkey, value);
 					item.setPremise(tmp);
 				}
-				if(null != item.getLeft()) {
+				if (null != item.getLeft()) {
 					String tmp = item.getLeft().replaceAll(nkey, value);
 					item.setLeft(tmp);
 				}
-				if(null != item.getRight()) {
+				if (null != item.getRight()) {
 					String tmp = item.getRight().replaceAll(nkey, value);
 					item.setRight(tmp);
 				}

@@ -1,6 +1,0 @@
-lwz	11, <VAR1>.Offset(31)
-lwz	0, <VAR2>.Offset(31)
-divw	9, 11, 0
-lwz	0, 12(31)
-mullw	0, 9, 0
-subf	0, 0, 11

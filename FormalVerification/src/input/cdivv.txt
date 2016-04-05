@@ -1,0 +1,3 @@
+lwz 9,<VAR>
+li  0,<CON>
+divw  0,0,9

@@ -25,7 +25,7 @@ public class Assembler {
 	
 	// 控制生成的汇编代码中，变量是以数字还是原始名称出现
 	// 默认false，为原始名称出现
-	private boolean isVariableSymbolOrNumber = false;
+	private boolean isVariableSymbolOrNumber = true;
 	
 	public Assembler(SyntaxTree tree) {
 		super();
@@ -1334,7 +1334,7 @@ public class Assembler {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String src = "src/input/evenSum.c";
+		String src = "src/input/sum_for.c";
 		String filename = src.substring(src.lastIndexOf("/") + 1);
 		Lexer lexer = new Lexer(Lexer.getContent(src));
 		lexer.runLexer();

@@ -1,0 +1,4 @@
+.L1:
+     <VAR>
+	lwz 0,.L1
+	ori 0,0,<CON>

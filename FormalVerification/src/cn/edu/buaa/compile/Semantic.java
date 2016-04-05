@@ -4,14 +4,15 @@ import java.util.List;
 
 /**
  * 存储每条汇编指令的指称语义
+ * 
  * @author destiny
  */
-public class Semantic {	
+public class Semantic {
 	private List<Item> semanSet;
-	
+
 	public Semantic() {
 	}
-	
+
 	public Semantic(List<Item> semanSet) {
 		this.semanSet = semanSet;
 	}

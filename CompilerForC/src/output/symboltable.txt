@@ -1,5 +1,6 @@
 tmp 20
-.LC5 null
+bss_tmp2 28
+.LC3 null
 i 12
 bss_tmp1 24
 sum 16

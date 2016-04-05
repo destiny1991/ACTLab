@@ -1,0 +1,7 @@
+.L1:
+     <VAR>
+	lwz 9, .L1
+     li  11,<CON>
+	divw 0,11,9
+	mullw 0,0,9
+	subf 0,0,11

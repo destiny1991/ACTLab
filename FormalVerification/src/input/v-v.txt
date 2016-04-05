@@ -1,0 +1,3 @@
+lwz 9,<VAR2>
+lwz 0,<VAR1>
+subf 0,9,0

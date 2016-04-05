@@ -4,20 +4,21 @@ import java.util.Map;
 
 /**
  * Instruction持久化类
+ * 
  * @author destiny
  */
 public class Instruction {
 	private String name;
 	private Map<String, String> paras;
 	private Semantic seman;
-	
+
 	public Instruction() {
 	}
-	
+
 	public Instruction(String name) {
 		this.name = name;
 	}
-	
+
 	public String getName() {
 		return name;
 	}

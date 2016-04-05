@@ -1,5 +1,5 @@
-Address_1:
-<STA-LIST>
-<LOG-EXP>
-cmpi	7, 0, 0, 0
-bc    12, 29, @Address_1
+L1:
+	<STA-LIST>
+	<LOG-EXP>
+	cmpi 7,0,0,0
+	bne 7,.L1

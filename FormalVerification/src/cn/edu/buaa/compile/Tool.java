@@ -21,6 +21,7 @@ public class Tool {
 		List<String> tmp = new ArrayList<String>();
 		if(null != lines && 0 != lines.length) {
 			for(String s : lines) {
+				s = s.trim();
 				if(0 == s.length() || "\t" == s || " " == s || "," == s || "" == s ||
 						"(" == s || ")" == s) continue;
 				tmp.add(s);
@@ -147,7 +148,6 @@ public class Tool {
 							+ item.getLeft() + " = " + item.getRight());
 				}
 			}
-			System.out.println();
 		}
 	}
 	
