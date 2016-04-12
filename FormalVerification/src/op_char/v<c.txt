@@ -1,0 +1,8 @@
+.L1:
+     <VAR>
+	lbz 0, .L1
+	rlwinm 0,0,0,0xff
+	cmpli 7,0,0, <CON>-1
+	li 0,1
+	isel 0,0,0,29
+	rlwinm 0,0,0,0xff

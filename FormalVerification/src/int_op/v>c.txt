@@ -1,0 +1,7 @@
+.L1:
+     <VAR>
+lwz 0,.L1
+cmpi 7,0,0,<CON>
+li 0,0
+li 9,1
+isel 0,9,0,29

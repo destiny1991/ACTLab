@@ -1,3 +1,10 @@
 /output/
-/cn/
 /input/
+/cn/
+/short_int/
+/long_int/
+/float_op/
+/int_op/
+/double_op/
+/char_op/
+/op_char/

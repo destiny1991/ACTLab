@@ -139,6 +139,8 @@ public class Tool {
 		for(Semantic sm : seman) {
 			List<Item> semanSet = sm.getSemanSet();
 			for(Item item : semanSet) {
+				if(item.getLeft().contains("PR[") && !item.getLeft().contains("PR[0]")) 
+					continue;
 				if(null == item.getPremise() && null == item.getRight()) {
 					System.out.println(item.getLeft());
 				} else if(null == item.getPremise()) {

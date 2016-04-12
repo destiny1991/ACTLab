@@ -1,4 +1,0 @@
-lwz 0, <VAR>
-cmpi 7,0,0,<CON>
-li 0,1
-isel 0,0,0,29

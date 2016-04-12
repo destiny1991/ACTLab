@@ -1,0 +1,9 @@
+.L1:
+     <VAR>
+	lbz 0, .L1
+	rlwinm 0,0,0,0xff
+	xori 0,0, <CON>
+	rlwinm 0,0,0,0xff
+	neg 0,0
+	srwi 0,0,31
+	rlwinm 0,0,0,0xff

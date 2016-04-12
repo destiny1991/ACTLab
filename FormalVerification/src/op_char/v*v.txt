@@ -1,0 +1,7 @@
+.L1:
+     <VAR1>
+.L2:
+     <VAR2>
+	lbz 9, .L1
+	lbz 0, .L2
+	mullw 0,9,0

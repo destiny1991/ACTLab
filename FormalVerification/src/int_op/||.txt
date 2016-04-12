@@ -1,0 +1,12 @@
+	<RELLOG-EXP1>
+    cmpi 7,0,0,0
+    bne 7,.L1
+    <RELLOG-EXP2>
+    cmpi 7,0,0,0
+    beq 7,.L2
+.L1:
+	li 0,1
+	b .L3
+.L2:
+	li 0,0
+.L3:

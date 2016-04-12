@@ -1,0 +1,6 @@
+.L1:
+     <VAR>
+	lbz 0, .L1
+	rlwinm 9,0,0,0xff
+	addi 0,9,-<CON>.CharValue
+	rlwinm 0,0,0,0xff

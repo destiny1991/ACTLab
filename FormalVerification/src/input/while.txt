@@ -1,7 +1,0 @@
-	b .L2
-.L1:
-	<STA-LIST>
-.L2:
-	<LOG-EXP>
-	cmpi 7,0,0,0
-	bne 7,.L1

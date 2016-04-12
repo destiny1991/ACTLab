@@ -1,0 +1,10 @@
+.L1:
+     <VAR1>
+.L2:
+     <VAR2>
+	lbz 0, .L1
+	rlwinm 9,0,0,0xff
+	lbz 0, .L2
+	rlwinm 0,0,0,0xff
+	subf 0,0,9
+	rlwinm 0,0,0,0xff

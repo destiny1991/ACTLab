@@ -97,6 +97,90 @@ public class Helper {
 			paras.put("rS", lines[2]);
 			paras.put("rB", lines[3]);
 			break;
+			
+		case "lhz":
+			paras.put("rD", lines[1]);
+			paras.put("D", lines[2]);
+			if(lines.length > 3) paras.put("rA", lines[3]);
+			break;
+		case "rlwinm":
+			paras.put("rA", lines[1]);
+			paras.put("rS", lines[2]);
+			paras.put("SH", lines[3]);
+			paras.put("MBE", lines[4]);
+			break;
+		case "extsh":
+			paras.put("rA", lines[1]);
+			paras.put("rS", lines[2]);
+			break;
+		case "neg":
+			paras.put("rD", lines[1]);
+			paras.put("rA", lines[2]);
+			break;
+		case "srwi":
+			paras.put("rA", lines[1]);
+			paras.put("rS", lines[2]);
+			paras.put("SH", lines[3]);
+			break;
+			
+		case "lfs":
+		case "lis":
+		case "lfd":
+			paras.put("frD", lines[1]);
+			paras.put("D", lines[2]);
+			if(lines.length > 3) paras.put("rA", lines[3]);
+			break;
+		case "fadds":
+		case "fsubs":
+		case "fdivs":
+			paras.put("frD", lines[1]);
+			paras.put("frA", lines[2]);
+			paras.put("frB", lines[3]);
+			break;
+		case "fmuls":
+			paras.put("frD", lines[1]);
+			paras.put("frA", lines[2]);
+			paras.put("frC", lines[3]);
+			break;
+		case "fcmpu":
+			paras.put("crfD", lines[1]);
+			paras.put("frA", lines[2]);
+			paras.put("frB", lines[3]);
+			break;
+			
+		case "fadd":
+		case "fsub":
+		case "fdiv":
+			paras.put("frD", lines[1]);
+			paras.put("frA", lines[2]);
+			paras.put("frB", lines[3]);
+			break;
+		case "fmul":
+			paras.put("frD", lines[1]);
+			paras.put("frA", lines[2]);
+			paras.put("frC", lines[3]);
+			break;
+			
+		case "lbz":
+			paras.put("rD", lines[1]);
+			paras.put("D", lines[2]);
+			if(lines.length > 3) paras.put("rA", lines[3]);
+			break;
+		
+		case "cmpl":
+			paras.put("crfD", lines[1]);
+			paras.put("L", lines[2]);
+			paras.put("rA", lines[3]);
+			paras.put("rB", lines[4]);
+			break;
+			
+		case "cmpli":
+			paras.put("crfD", lines[1]);
+			paras.put("L", lines[2]);
+			paras.put("rA", lines[3]);
+			paras.put("UIMM", lines[4]);
+			break;
+		
 		default:
 			throw new Exception("generateParams 中没法找到指令： " + lines[0]);
 		}
@@ -158,6 +242,20 @@ public class Helper {
 				}
 			}
 			break;
+		case "rlwinm":
+			for (Item e : ts) {
+				try {
+					item = (Item) e.clone();
+					if(paras.get("SH").equals("0") && item.getRight().contains("SH")) {
+						item.setRight("GPR[rS] & MBE");
+					}			
+					semanSet.add(item);
+				} catch (CloneNotSupportedException e1) {
+					e1.printStackTrace();
+				}
+			}
+			break;
+			
 		default:
 			for (Item e : ts) {
 				try {

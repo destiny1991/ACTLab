@@ -1,0 +1,6 @@
+.L1:
+     <VAR>
+	lfs 13, .L1
+	lis 9,.LC2@ha
+	lfs 0,.LC2@l(9)
+	fsubs 0,13,0

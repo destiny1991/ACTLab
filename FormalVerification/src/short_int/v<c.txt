@@ -1,0 +1,8 @@
+.L1:
+     <VAR>
+	lhz 0,.L1
+	extsh 0,0
+	cmpi 7,0,0,<CON> - 1
+	li 0,1
+	isel 0,0,0,29
+	extsh 0,0

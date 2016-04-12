@@ -1,0 +1,12 @@
+.L1:
+     <VAR1>
+.L2:
+     <VAR2>
+	lbz 0, .L1
+	rlwinm 9,0,0,0xff
+	lbz 0, .L2
+	xor 0,9,0
+	rlwinm 0,0,0,0xff
+	neg 0,0
+	srwi 0,0,31
+	rlwinm 0,0,0,0xff

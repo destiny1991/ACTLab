@@ -1,0 +1,11 @@
+.L1:
+     <VAR1>
+.L2:
+     <VAR2>
+	lbz 0, .L1
+	extsh 11,0
+	lbz 0, .L2
+	extsh 9,0
+	divw 0,11,9
+	mullw 0,0,9
+	subf 0,0,11

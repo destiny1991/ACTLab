@@ -1,0 +1,12 @@
+.L1:
+     <VAR>
+.LC2:
+    <CON>
+	lfd 13, .L1
+	lis 9,.LC2@ha
+	lfd 0,.LC2@l(9)
+	fcmpu 7,13,0
+	li 0,0
+	li 9,1
+	isel 0,9,0,28
+

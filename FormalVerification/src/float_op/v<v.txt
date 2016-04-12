@@ -1,0 +1,10 @@
+.L1:
+     <VAR1>
+.L2:
+     <VAR2>
+	lfs 0, .L1
+	lfs 13, .L2
+	fcmpu 7,0,13
+	li 0,0
+	li 9,1
+	isel 0,9,0,28

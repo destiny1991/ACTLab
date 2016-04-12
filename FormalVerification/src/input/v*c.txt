@@ -1,2 +1,0 @@
-lwz 0,<VAR>
-mulli 0,0,<CON>

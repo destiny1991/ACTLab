@@ -1,0 +1,9 @@
+.L1:
+     <VAR>
+	lhz 0, .L1
+	extsh 0,0
+	xori 0,0, <CON>
+	rlwinm 0,0,0,0xffff
+	neg 0,0
+	srwi 0,0,31
+	extsh 0,0

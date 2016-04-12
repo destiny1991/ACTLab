@@ -1,3 +1,0 @@
-lwz 9, <VAR2>
-lwz 0, <VAR1>
-mullw 0,0,9

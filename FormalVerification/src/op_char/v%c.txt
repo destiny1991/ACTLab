@@ -1,0 +1,8 @@
+.L1:
+     <VAR>
+	lbz 0, .L1
+	extsh 11,0
+	li 9, <CON>.CharValue
+	divw 0,11,9
+	mullw 0,0,9
+	subf 0,0,11

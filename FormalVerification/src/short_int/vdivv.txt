@@ -1,0 +1,9 @@
+.L1:
+     <VAR1>
+.L2:
+     <VAR2>
+	lhz 9, .L1
+	extsh 9,0
+	lhz 0, .L2
+	extsh 0,0
+	divw 0,9,0

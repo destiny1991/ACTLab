@@ -1,0 +1,9 @@
+.L1:
+     <VAR1>
+.L2:
+     <VAR2>
+	lbz 0, .L1
+	extsh 9,0
+	lbz 0, .L2
+	extsh 0,0
+	slw 0,9,0

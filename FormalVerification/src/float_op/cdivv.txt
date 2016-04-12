@@ -1,0 +1,8 @@
+.L1:
+     <VAR>
+.LC2:
+    <CON>
+	lis 9,.LC2@ha
+	lfs 13,.LC2@l(9)
+	lfs 0, .L1
+	fdivs 0,13,0

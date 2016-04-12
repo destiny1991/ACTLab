@@ -1,0 +1,8 @@
+.L1:
+     <VAR>
+.LC2:
+    <CON>
+	lfd 13, .L1
+	lis 9,.LC2@ha
+	lfd 0,.LC2@l(9)
+	fsub 0,13,0

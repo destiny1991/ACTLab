@@ -1,0 +1,4 @@
+.L1:
+     <VAR>
+	lbz 0, .L1
+	andi. 0,0,<CON>.CharValue

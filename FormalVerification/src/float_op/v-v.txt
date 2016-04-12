@@ -1,0 +1,7 @@
+.L1:
+     <VAR1>
+.L2:
+     <VAR2>
+lfs 13, .L1
+	lfs 0, .L2
+	fsubs 0,13,0
