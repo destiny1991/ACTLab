@@ -1,10 +1,10 @@
 /output/
-/input/
+/.DS_Store
+/.gitignore
 /cn/
-/short_int/
-/long_int/
-/float_op/
-/int_op/
-/double_op/
-/char_op/
 /op_char/
+/op_double/
+/op_float/
+/op_int/
+/op_long/
+/op_short/

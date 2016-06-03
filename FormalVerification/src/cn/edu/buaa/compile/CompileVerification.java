@@ -314,7 +314,7 @@ public class CompileVerification {
 
 	public static void main(String[] args) throws Exception {
 		CompileVerification cv = new CompileVerification();
-		String inputPath = "src/op_char/?:.txt";
+		String inputPath = "src/op_int/if.txt";
 		cv.runApp(inputPath);
 	}
 }

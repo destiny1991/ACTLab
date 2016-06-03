@@ -1,5 +1,9 @@
-lwz 9,<VAR1>
-lwz 0,<VAR2>
+.L1:
+     <VAR1>
+.L2:
+     <VAR2>
+lwz 9, .L1
+lwz 0, .L2
 xor 0,9,0
 cmpi 7,0,0,0
 li 0,0
