@@ -4,18 +4,34 @@ import java.util.List;
 
 public class Proposition {
 	
-	private List<Item> proposition;		// 每个命题可能包含多项
+	private List<Item> items;		// 每个命题可能包含多项
 	
-	public int size() {
-		return proposition.size();
+	public Proposition() {
 	}
 	
-	public List<Item> getProposition() {
-		return proposition;
+	public Proposition(List<Item> items) {
+		this.items = items;
 	}
 
-	public void setProposition(List<Item> proposition) {
-		this.proposition = proposition;
+	public List<Item> getItems() {
+		return items;
+	}
+
+	public void setItems(List<Item> items) {
+		this.items = items;
+	}
+
+	public int size() {
+		return items.size();
+	}
+	
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		for(Item item : items) {
+			sb.append(item.toString()).append("\n");
+		}
+		return sb.toString();
 	}
 	
 }
