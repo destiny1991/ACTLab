@@ -1,9 +1,11 @@
 package cn.edu.buaa.prover;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +24,9 @@ public class Prover {
 	private Map<String, Proposition> axioms;
 	// 所有语句的目标码模式
 	private Map<String, List<String>> allObjectCodePatterns;
-
+	// 中间过程输出结果
+	public BufferedWriter bufferedWriter;
+	
 	public Prover() {
 		loadAxioms("src/main/resources/axiom/ppcAxiom.xls");
 //		showAxioms();
@@ -37,17 +41,52 @@ public class Prover {
 	 * 2) 推理证明
 	 * 3) 获得语义
 	 * @param objectCodePatterns
+	 * @throws IOException 
 	 */
 	public void proveProcess(List<String> objectCodePatterns) {
 		
+		if (bufferedWriter != null) {
+			try {
+				bufferedWriter.write("目标码模式 :\n");
+				saveAllString(objectCodePatterns);
+				bufferedWriter.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		List<Proposition> propositions = PropositionMappingAlgorithm.process(objectCodePatterns, axioms);
 		showAllProposition(propositions);
+		if (bufferedWriter != null) {
+			try {
+				bufferedWriter.write("目标码模式命题 :\n");
+				saveAllProposition(propositions);
+				bufferedWriter.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		
-//		List<Proposition> semantemes = AutomaticDerivationAlgorithm.process(propositions);
+		System.out.println("\n=============================\n");
 		
+		List<Proposition> semantemes = AutomaticDerivationAlgorithm.process(propositions);
+		showAllProposition(semantemes);
+		if (bufferedWriter != null) {
+			try {
+				bufferedWriter.write("命题推理结果 :\n");
+				saveAllProposition(semantemes);
+				bufferedWriter.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// 获得语义
+		
+		// 循环交互证明算法
 		
 	}
-	
+
 	public List<String> getObjectCodePatterns(String key) {
 		return allObjectCodePatterns.get(key);
 	}
@@ -177,9 +216,39 @@ public class Prover {
 		}
 	}
 	
+	public void createOutputFile(String key) {
+		try {
+			bufferedWriter = new BufferedWriter(
+					new FileWriter("src/main/resources/output/" + key + ".txt"));
+			bufferedWriter.write("======================结果输出=======================\n");
+			bufferedWriter.write("语句 : " + key + "\n");
+			bufferedWriter.newLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void saveAllProposition(List<Proposition> propositions) throws IOException {
+		for (Proposition proposition : propositions) {
+			bufferedWriter.write(proposition.toString());
+		}
+		bufferedWriter.newLine();
+	}
+	
+	public void saveAllString(List<String> objectCodePatterns) throws IOException {
+		for (String str : objectCodePatterns) {
+			bufferedWriter.write(str);
+			bufferedWriter.newLine();
+		}
+		bufferedWriter.newLine();
+	}
+	
 	public static void main(String[] args) {
 		Prover prover = new Prover();
-		List<String> objectCodePatterns = prover.getObjectCodePatterns("while");
+		String key = "if";
+		List<String> objectCodePatterns = prover.getObjectCodePatterns(key);
+		prover.createOutputFile(key);
 		prover.proveProcess(objectCodePatterns);
 	}
 }
