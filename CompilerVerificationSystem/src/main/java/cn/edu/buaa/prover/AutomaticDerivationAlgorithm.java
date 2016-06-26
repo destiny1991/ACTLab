@@ -36,8 +36,7 @@ public class AutomaticDerivationAlgorithm {
 
 		return newPropositions;
 	}
-	
-	
+
 	// false : 不删除pl
 	// left = right
 	// left = right
@@ -61,7 +60,7 @@ public class AutomaticDerivationAlgorithm {
 			ql.get(0).setRight(right);
 			return false;
 		}
-		
+
 		return false;
 	}
 
@@ -89,7 +88,7 @@ public class AutomaticDerivationAlgorithm {
 			}
 		}
 		ql.clear();
-		
+
 		return false;
 	}
 
@@ -98,8 +97,7 @@ public class AutomaticDerivationAlgorithm {
 	 * premise left = right 
 	 * 如： 
 	 * GPR[0] < 0 -> CR[7] = b100 
-	 * GPR[0] > 0 -> CR[7] = b100 
-	 * GPR[0] == 0 -> CR[8] = b100
+	 * GPR[0] > 0 -> CR[7] = b100 GPR[0] == 0 -> CR[8] = b100
 	 * 
 	 * CR[0] = 22
 	 */
@@ -113,13 +111,13 @@ public class AutomaticDerivationAlgorithm {
 				item.setRight(right);
 			}
 		}
-		
+
 		return false;
 
 	}
 
-	private static boolean solveItems4(List<Item> pl, List<Item> ql) {	
-		
+	private static boolean solveItems4(List<Item> pl, List<Item> ql) {
+
 		int cnt = 0;
 		for (Item itemQ : ql) {
 			for (Item itemP : pl) {
@@ -130,13 +128,13 @@ public class AutomaticDerivationAlgorithm {
 				}
 			}
 		}
-		
+
 		if (cnt == ql.size()) {
 			return true;
 		} else {
 			return false;
 		}
-		
+
 	}
 
 	// p : 为待加入的； q : 为已加入的
@@ -144,9 +142,9 @@ public class AutomaticDerivationAlgorithm {
 
 		if (!checkBoundary(p, q))
 			return false;
-		
+
 		boolean isDeleteP = false;
-		
+
 		// left = right
 		// left = right
 		if (p.getItems().get(0).getPremise() == null && q.getItems().get(0).getPremise() == null) {

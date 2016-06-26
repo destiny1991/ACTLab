@@ -52,23 +52,23 @@ public class PropositionMappingAlgorithm {
 
 	private static Proposition createProposition(String name, Map<String, String> paras,
 			Map<String, Proposition> axioms) {
-		
-		if(!axioms.containsKey(name)) {
+
+		if (!axioms.containsKey(name)) {
 			try {
 				throw new Exception("createProposition()缺少指称语义：" + name);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 		Proposition prop = ProverHelper.cloneProposition(axioms.get(name));
 		ProverHelper.updatePropositionWithParas(name, prop, paras);
-		
-		for(String key : paras.keySet()) {
+
+		for (String key : paras.keySet()) {
 			String value = paras.get(key);
 			String nKey = "\\b" + key + "\\b";
-			
-			for(Item item : prop.getItems()) {
+
+			for (Item item : prop.getItems()) {
 				if (item.getPremise() != null) {
 					String tmp = item.getPremise().replaceAll(nKey, value);
 					item.setPremise(tmp);
@@ -83,7 +83,7 @@ public class PropositionMappingAlgorithm {
 				}
 			}
 		}
-		
+
 		return prop;
 	}
 
@@ -92,8 +92,7 @@ public class PropositionMappingAlgorithm {
 		List<String> tmp = new ArrayList<String>();
 		for (String line : lines) {
 			line = line.trim();
-			if (line.length() == 0 || line.equals(",") 
-					|| line.equals("(") || line.equals(")")) {
+			if (line.length() == 0 || line.equals(",") || line.equals("(") || line.equals(")")) {
 				continue;
 			}
 			tmp.add(line);

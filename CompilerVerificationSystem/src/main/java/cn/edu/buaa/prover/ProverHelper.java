@@ -9,7 +9,7 @@ import cn.edu.buaa.pojo.Item;
 import cn.edu.buaa.pojo.Proposition;
 
 public class ProverHelper {
-	
+
 	public static Map<String, String> generateParas(String[] lines) {
 		Map<String, String> paras = new HashMap<String, String>();
 		switch (lines[0]) {
@@ -193,57 +193,57 @@ public class ProverHelper {
 	}
 
 	public static void updatePropositionWithParas(String name, Proposition prop, Map<String, String> paras) {
-		
-		switch(name) {
+
+		switch (name) {
 		case "isel":
-			if(paras.get("crb").equals("28")) {
+			if (paras.get("crb").equals("28")) {
 				Item item = prop.getItems().get(0);
 				item.setRight("GPR[rA]");
-				if(paras.get("rA").equals("0")) {
+				if (paras.get("rA").equals("0")) {
 					item.setRight("0");
 				}
-				
+
 				item = prop.getItems().get(1);
 				item.setRight("GPR[rB]");
-				
+
 				item = prop.getItems().get(2);
 				item.setRight("GPR[rB]");
-				
-			} else if(paras.get("crb").equals("29")) {
-				
+
+			} else if (paras.get("crb").equals("29")) {
+
 				Item item = prop.getItems().get(0);
 				item.setRight("GPR[rB]");
-				
+
 				item = prop.getItems().get(1);
 				item.setRight("GPR[rA]");
-				if(paras.get("rA").equals("0")) {
+				if (paras.get("rA").equals("0")) {
 					item.setRight("0");
 				}
-				
+
 				item = prop.getItems().get(2);
 				item.setRight("GPR[rB]");
-				
+
 			} else {
-				for(Item item : prop.getItems()) {
-					if(item.getRight().equals("GPR[rA]") && paras.get("rA").equals("0")) {
+				for (Item item : prop.getItems()) {
+					if (item.getRight().equals("GPR[rA]") && paras.get("rA").equals("0")) {
 						item.setRight("0");
 					}
 				}
-			} 
-			
+			}
+
 			break;
 		case "addi":
-			for(Item item : prop.getItems()) {
-				if(item.getRight().contains("rA") && paras.get("rA").equals("0")) {
+			for (Item item : prop.getItems()) {
+				if (item.getRight().contains("rA") && paras.get("rA").equals("0")) {
 					item.setRight("0");
 				}
 			}
-			
+
 			break;
 		case "rlwinm":
-			
-			for(Item item : prop.getItems()) {
-				if(item.getRight().contains("SH") && paras.get("SH").equals("0")) {
+
+			for (Item item : prop.getItems()) {
+				if (item.getRight().contains("SH") && paras.get("SH").equals("0")) {
 					item.setRight("GPR[rS] & MBE");
 				}
 			}
@@ -251,7 +251,7 @@ public class ProverHelper {
 		default:
 			break;
 		}
-		
+
 	}
 
 	public static Proposition cloneProposition(Proposition proposition) {
@@ -268,6 +268,84 @@ public class ProverHelper {
 		prop.setItems(items);
 
 		return prop;
+	}
+	
+	public static void reducePropositionOfThree(Proposition proposition) {
+		
+		Item a = proposition.getItems().get(0);
+		Item b = proposition.getItems().get(1);
+		Item c = proposition.getItems().get(2);
+		
+		if (a.getRight() != null && b.getRight() != null && c.getRight() != null
+				&& a.getRight().equals(b.getRight()) && a.getRight().equals(c.getRight())) {
+			a.setPremise(null);
+			proposition.getItems().remove(b);
+			proposition.getItems().remove(c);
+		} else if (a.getRight() != null && b.getRight() != null 
+				&& a.getRight().equals(b.getRight())) {
+			if (a.getPremise().contains(" < ") && b.getPremise().contains(" > ")) {
+				a.setPremise(a.getPremise().replace(" < ", " != "));
+				proposition.getItems().remove(b);
+			} else if (a.getPremise().contains(" < ") && b.getPremise().contains(" == ")) {
+				a.setPremise(a.getPremise().replace(" < ", " <= "));
+				proposition.getItems().remove(b);
+			} else if (a.getPremise().contains(" > ") && b.getPremise().contains(" < ")) {
+				a.setPremise(a.getPremise().replace(" > ", " != "));
+				proposition.getItems().remove(b);
+			} else if (a.getPremise().contains(" > ") && b.getPremise().contains(" == ")) {
+				a.setPremise(a.getPremise().replace(" > ", " >= "));
+				proposition.getItems().remove(b);
+			} else if (a.getPremise().contains(" == ") && b.getPremise().contains(" > ")) {
+				a.setPremise(a.getPremise().replace(" == ", " >= "));
+				proposition.getItems().remove(b);
+			} else if (a.getPremise().contains(" == ") && b.getPremise().contains(" < ")) {
+				a.setPremise(a.getPremise().replace(" == ", " <= "));
+				proposition.getItems().remove(b);
+			}
+		} else if (a.getRight() != null && c.getRight() != null
+				&& a.getRight().equals(c.getRight())) {
+			if (a.getPremise().contains(" < ") && c.getPremise().contains(" > ")) {
+				a.setPremise(a.getPremise().replace(" < ", " != "));
+				proposition.getItems().remove(c);
+			} else if (a.getPremise().contains(" < ") && c.getPremise().contains(" == ")) {
+				a.setPremise(a.getPremise().replace(" < ", " <= "));
+				proposition.getItems().remove(c);
+			} else if (a.getPremise().contains(" > ") && c.getPremise().contains(" < ")) {
+				a.setPremise(a.getPremise().replace(" > ", " != "));
+				proposition.getItems().remove(c);
+			} else if (a.getPremise().contains(" > ") && c.getPremise().contains(" == ")) {
+				a.setPremise(a.getPremise().replace(" > ", " >= "));
+				proposition.getItems().remove(c);
+			} else if (a.getPremise().contains(" == ") && c.getPremise().contains(" > ")) {
+				a.setPremise(a.getPremise().replace(" == ", " >= "));
+				proposition.getItems().remove(c);
+			} else if (a.getPremise().contains(" == ") && c.getPremise().contains(" < ")) {
+				a.setPremise(a.getPremise().replace(" == ", " <= "));
+				proposition.getItems().remove(c);
+			}
+		} else if (b.getRight() != null && c.getRight() != null
+				&& b.getRight().equals(c.getRight())) {
+			if (b.getPremise().contains(" < ") && c.getPremise().contains(" > ")) {
+				b.setPremise(b.getPremise().replace(" < ", " != "));
+				proposition.getItems().remove(c);
+			} else if (b.getPremise().contains(" < ") && c.getPremise().contains(" == ")) {
+				b.setPremise(b.getPremise().replace(" < ", " <= "));
+				proposition.getItems().remove(c);
+			} else if (b.getPremise().contains(" > ") && c.getPremise().contains(" < ")) {
+				b.setPremise(b.getPremise().replace(" > ", " != "));
+				proposition.getItems().remove(c);
+			} else if (b.getPremise().contains(" > ") && c.getPremise().contains(" == ")) {
+				b.setPremise(b.getPremise().replace(" > ", " >= "));
+				proposition.getItems().remove(c);
+			} else if (b.getPremise().contains(" == ") && c.getPremise().contains(" > ")) {
+				b.setPremise(b.getPremise().replace(" == ", " >= "));
+				proposition.getItems().remove(c);
+			} else if (b.getPremise().contains(" == ") && c.getPremise().contains(" < ")) {
+				b.setPremise(b.getPremise().replace(" == ", " <= "));
+				proposition.getItems().remove(c);
+			}
+		}
+		
 	}
 
 }

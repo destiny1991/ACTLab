@@ -2,14 +2,14 @@
 语句 : do_while
 
 目标码模式 :
-L1:
+.L1:
 <STA-LIST>
 <LOG-EXP>
 cmpi 7,0,0,0
 bne 7,.L1
 
 目标码模式命题 :
-L1:
+.L1:
 <STA-LIST>
 GPR[0] = <LOG-EXP>
 GPR[0] < 0 -> CR[7] = b100
@@ -20,7 +20,7 @@ CR[7] == b010 -> PC = PC + @.L1
 CR[7] == b001 -> PC = PC + 4
 
 命题推理结果 :
-L1:
+.L1:
 <STA-LIST>
 <LOG-EXP> < 0 -> PC = PC + @.L1
 <LOG-EXP> > 0 -> PC = PC + @.L1
