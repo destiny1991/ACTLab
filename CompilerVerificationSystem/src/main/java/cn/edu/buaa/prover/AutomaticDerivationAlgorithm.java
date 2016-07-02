@@ -14,8 +14,14 @@ import cn.edu.buaa.pojo.Proposition;
  */
 public class AutomaticDerivationAlgorithm {
 
-	public static List<Proposition> process(List<Proposition> propositions) {
-
+	public static List<Proposition> process(List<Proposition> srcPropositions) {
+		
+		List<Proposition> propositions = new ArrayList<>();
+		for (Proposition proposition : srcPropositions) {
+			Proposition tmp = ProverHelper.cloneProposition(proposition);
+			propositions.add(tmp);
+		}
+		
 		List<Proposition> newPropositions = new ArrayList<>();
 		for (int i = 0; i < propositions.size(); i++) {
 			boolean isDeleteP = false;

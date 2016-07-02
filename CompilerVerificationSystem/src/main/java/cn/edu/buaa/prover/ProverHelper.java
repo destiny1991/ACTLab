@@ -1,5 +1,7 @@
 package cn.edu.buaa.prover;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -268,6 +270,13 @@ public class ProverHelper {
 		prop.setItems(items);
 
 		return prop;
+	}
+	
+	public static void saveAllProposition(List<Proposition> propositions, BufferedWriter bufferedWriter) throws IOException {
+		for (Proposition proposition : propositions) {
+			bufferedWriter.write(proposition.toString());
+		}
+		bufferedWriter.newLine();
 	}
 	
 	public static void reducePropositionOfThree(Proposition proposition) {

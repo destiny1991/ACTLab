@@ -26,3 +26,18 @@ CR[7] == b001 -> PC = PC + @.L1
 <STA-LIST>
 .L1:
 
+推理出的语义为 :
+<LOG-EXP> != 0 -> <STA-LIST>
+<LOG-EXP> == 0 -> null
+
+σ-transfer : 
+
+<LOG-EXP> != 0 -> σ(<STA-LIST>)
+<LOG-EXP> == 0 -> skip
+
+给定的目标语义为 :
+<LOG-EXP> != 0 -> σ(<STA-LIST>)
+<LOG-EXP> == 0 -> skip
+
+给定的目标语义和推理出的语义是否一致 :
+true
