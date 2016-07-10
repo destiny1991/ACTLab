@@ -78,7 +78,7 @@ public class Prover {
 			}
 		}
 		
-		if (!ProverDefine.loops.contains(name)) {
+		if (!ProverDefine.LOOPS.contains(name)) {
 			// 非循环命题推导
 			System.out.println("\n==============命题推理结果===============\n");
 			List<Proposition> simplifiedPropositions = AutomaticDerivationAlgorithm.process(propositions);
