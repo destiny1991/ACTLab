@@ -130,13 +130,11 @@ public class Labeler {
 		}
 	}
 
-	public String generateLabel(Stack<Integer> stack) {
+	public static String generateLabel(Stack<Integer> stack) {
 		String v = "";
 
 		for (int i = 0; i < stack.size(); i++) {
-			if(i == 0) {
-				continue;
-			} else if (i == 1) {
+			if (i == 0) {
 				v += stack.get(i);
 			} else {
 				v += "." + stack.get(i);
@@ -154,7 +152,7 @@ public class Labeler {
 			reader = new BufferedReader(new FileReader(fileName));
 			String dir = fileName.substring(0, fileName.lastIndexOf("/")); 
 			writer = new BufferedWriter(new FileWriter(
-					dir + "/label2_" + fileName.substring(fileName.lastIndexOf("/") + 1)));
+					dir + "/label_" + fileName.substring(fileName.lastIndexOf("/") + 1)));
 
 			String line = null;
 			int len = 50;

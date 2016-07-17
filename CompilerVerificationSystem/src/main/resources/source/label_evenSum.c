@@ -1,22 +1,25 @@
-1	#include <stdio.h>
+#include <stdio.h>                                // 1
 
-3	int main() {
-4	    int n;
-5	    int i;
-6	    int sum;
-7	    int tmp;
-	
-9	    scanf("%d", &n);
-10	    sum = 0;
-11	    for(i = 1; i <= n; i++) {
-12	        tmp = i % 2;
-13	        if(tmp == 0) {
-14	            sum = sum + i;
-15	        } else {sum = sum - i * 2;
-            
-17	        }
-18	    }
-19	    printf("sum is %d", sum);
+int main() {                                      // 2
+    int n;                                        // 2.1
+    int i;                                        // 2.2
+    int sum;                                      // 2.3
+    int tmp;                                      // 2.4
 
-21	    return 0;
-22	}
+    scanf("%d", &n);                              // 2.5
+    sum = 0;                                      // 2.6
+
+    for(i = 1; i <= n; i++) {                     // 2.7
+        tmp = i % 2;                              // 2.7.1
+        if(tmp == 0) {                            // 2.7.2
+            sum = sum + i;                        // 2.7.2.1
+        } else {                                  // 2.7.3
+            sum = sum - i * 2;                    // 2.7.3.1
+        
+        }                                         // 2.7.4
+    }                                             // 2.8
+
+    printf("sum is %d", sum);                     // 2.9
+
+    return 0;                                     // 2.10
+}                                                 // 3

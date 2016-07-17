@@ -59,5 +59,12 @@ public class LexerDefine {
 	// 运算符
 	public static String[] operators = { "=", "&", "<", ">", "++", "--", 
 			"+", "-", "*", "/", "%", ">=", "<=", "!=", "==" };
-
+	
+	// 关键字
+	public static String[][] keywords = { 
+			{ "int", "float", "double", "char", "void" },
+			{ "if", "for", "while", "do", "else" }, 
+			{ "include", "return" } 
+	};
+	
 }

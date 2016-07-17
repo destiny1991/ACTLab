@@ -37,7 +37,7 @@ public class Prover {
 		loadAllObjectCodePatterns("src/main/resources/statement/");
 		// showAllObjectCodePatterns();
 		
-		loadLoopInvariants("src/main/resources/goal/");
+		loadPrecoditions("src/main/resources/precodition/");
 		// showAllLoopInvariants();
 		
 	}
@@ -230,7 +230,7 @@ public class Prover {
 		}
 	}
 
-	public void loadLoopInvariants(String dirName) {
+	public void loadPrecoditions(String dirName) {
 		loopInvariants = new HashMap<>();
 
 		File dir = new File(dirName);
