@@ -10,11 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cn.edu.buaa.constant.LexerDefine;
 import cn.edu.buaa.pojo.Token;
 
 public class Lexer {
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(Lexer.class);
+	private static final String INPUT_PATH = "src/main/resources/input/";
+	private static final String OUTPUT_PATH = "src/main/resources/output/";
+	
 	private List<String> src;
 	private List<Token> tokens;
 
@@ -23,8 +30,18 @@ public class Lexer {
 		src = getContent(fileName);
 	}
 
-	public void runLexer() {
+	public List<String> getSrc() {
+		return src;
+	}
 
+	public List<Token> getTokens() {
+		return tokens;
+	}
+
+	public void runLexer() {
+		
+		logger.info("Lexer analyze starting...");
+		
 		Stack<Integer> stack = new Stack<>();
 		stack.push(1);
 		for (String line : src) {
@@ -301,7 +318,7 @@ public class Lexer {
 		List<String> codes = new ArrayList<>();
 
 		try {
-			reader = new BufferedReader(new FileReader(fileName));
+			reader = new BufferedReader(new FileReader(INPUT_PATH + fileName));
 			String line = null;
 			while ((line = reader.readLine()) != null) {
 				codes.add(line);
@@ -430,9 +447,8 @@ public class Lexer {
 
 		BufferedWriter writer = null;
 		try {
-			String dir = fileName.substring(0, fileName.lastIndexOf("/"));
 			writer = new BufferedWriter(
-					new FileWriter(dir + "/label_" + fileName.substring(fileName.lastIndexOf("/") + 1)));
+					new FileWriter(OUTPUT_PATH + "/label_" + fileName));
 
 			int len = 50;
 			Stack<Integer> stack = new Stack<>();
@@ -501,12 +517,12 @@ public class Lexer {
 		BufferedWriter writer = null;
 
 		try {
-			writer = new BufferedWriter(new FileWriter("src/main/resources/output/lexer.txt"));
+			writer = new BufferedWriter(new FileWriter(OUTPUT_PATH + "lexer.txt"));
 			System.out.println("====================Lexer==================");
 			for (Token e : tokens) {
-				writer.write("(" + e.getType() + ", " + e.getValue() + ", " + e.getLabel() + ")");
+				writer.write("(" + e.getValue() + ", " + e.getType() + ", " + e.getLabel() + ")");
 				writer.newLine();
-				System.out.println("(" + e.getType() + ", " + e.getValue() + ", " + e.getLabel() + ")");
+				System.out.println("(" + e.getValue() + ", " + e.getType() + ", " + e.getLabel() + ")");
 			}
 			System.out.println();
 
@@ -526,12 +542,11 @@ public class Lexer {
 
 	public static void main(String[] args) {
 
-		String fileName = "src/main/resources/source/evenSum.c";
+		String fileName = "evenSum.c";
 
 		Lexer lexer = new Lexer(fileName);
 		lexer.outputSrc();
 		lexer.labelSrc(fileName);
-
 		lexer.runLexer();
 		lexer.outputLexer();
 

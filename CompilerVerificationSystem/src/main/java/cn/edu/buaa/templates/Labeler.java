@@ -1,4 +1,4 @@
-package cn.edu.buaa.labeler;
+package cn.edu.buaa.templates;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

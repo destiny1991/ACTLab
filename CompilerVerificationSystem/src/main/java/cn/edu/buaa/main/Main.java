@@ -1,6 +1,6 @@
 package cn.edu.buaa.main;
 
-import cn.edu.buaa.labeler.Labeler;
+import cn.edu.buaa.templates.Labeler;
 
 /**
  * 程序运行入口

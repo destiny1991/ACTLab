@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 /**
-*   a simple input by chen
+*   a simple input
 */
 int main() {
     int n;
