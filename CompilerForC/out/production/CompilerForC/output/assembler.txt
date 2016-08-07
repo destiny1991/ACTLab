@@ -1,10 +1,10 @@
-	.file	"sum_for.c"
+	.file	"evenSum.c"
 	.section .rodata
 	.align 2
 .LC0:
 	.string	"%d"
 	.align 2
-.LC3:
+.LC5:
 	.string	"sum is %d"
 	.section ".text"
 	.align 2
@@ -31,18 +31,53 @@ main:
 
 	b .L1
 .L2:
-	lwz 9,12(31)
 	lwz 0,12(31)
+	li 9,2
+	divw 11,0,9
+	mullw 9,11,9
+	subf 0,9,0
+	stw 0,24(31)
+
+	lwz 0,24(31)
+	stw 0,20(31)
+
+	lwz 0,20(31)
+	li 9,0
+	cmp 7,0,0,9
+	li 0,0
+	li 9,1
+	isel 0,9,0,30
+	stw 0,24(31)
+
+	lwz 0,24(31)
+	cmpi 7,0,0,0
+	beq 7,.L3
+
+	lwz 9,16(31)
+	lwz 0,12(31)
+	add 0,9,0
+	stw 0,24(31)
+
+	lwz 0,24(31)
+	stw 0,16(31)
+
+	b .L4
+.L3:
+
+	lwz 9,12(31)
+	li 0,2
 	mullw 0,9,0
 	stw 0,24(31)
 
 	lwz 9,16(31)
 	lwz 0,24(31)
-	add 0,9,0
+	subf 0,9,0
 	stw 0,28(31)
 
 	lwz 0,28(31)
 	stw 0,16(31)
+
+.L4:
 
 	lwz 0,12(31)
 	addic 0,0,1
@@ -60,8 +95,8 @@ main:
 	cmpi 7,0,0,0
 	bne 7,.L2
 
-	lis 0,.LC3@ha
-	addic 0,0,.LC3@l
+	lis 0,.LC5@ha
+	addic 0,0,.LC5@l
 	mr 3,0
 	lwz 4,16(31)
 	crxor 6,6,6

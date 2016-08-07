@@ -1,10 +1,14 @@
 package cn.edu.buaa.parser;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
+import cn.edu.buaa.constant.CommonsDefine;
 import cn.edu.buaa.constant.ParserDefine;
 import cn.edu.buaa.lexer.Lexer;
 import cn.edu.buaa.pojo.SyntaxTree;
@@ -12,7 +16,7 @@ import cn.edu.buaa.pojo.SyntaxTreeNode;
 import cn.edu.buaa.pojo.Token;
 
 public class Parser {
-	
+		
 	private List<Token> tokens;
 	private int index;
 	private SyntaxTree tree;
@@ -39,35 +43,6 @@ public class Parser {
 		return tokens.get(i).getLabel();
 	}
 	
-	// 判断是否是控制跳转的关键字
-	private boolean isControl(String tokenValue) {
-		for (String word : ParserDefine.CONTROL_WORDS) {
-			if (word.equals(tokenValue)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private boolean isInnerDataType(String tokenValue) {
-		for (String word : ParserDefine.INNER_DATAT_YPES) {
-			if (word.equals(tokenValue)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	// 判断是否是运算符
-	private boolean isOperator(String word) {
-		for (String str : ParserDefine.OPERATORS) {
-			if (str.equals(word)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	// include句型
 	private void _include(SyntaxTreeNode father) {
 		if (father == null) {
@@ -80,7 +55,8 @@ public class Parser {
 		includeTree.setCurrent(root);
 		tree.addChildNode(root, father);
 		
-		int cnt = 0;			// include语句中双引号的个数
+		// include语句中双引号的个数
+		int cnt = 0;
 		while (index < tokens.size()) {
 			
 			if (getTokenValue(index).equals("\"")) {
@@ -92,6 +68,7 @@ public class Parser {
 			includeTree.addChildNode(node, root);
 			
 			if (cnt == 2 || getTokenValue(index).equals(">")) {
+				index++;
 				break;
 			}
 			
@@ -114,9 +91,9 @@ public class Parser {
 		
 		while (index < tokens.size()) {
 			// 如果是函数返回类型
-			if (isInnerDataType(getTokenValue(index))) {
-				SyntaxTreeNode returnType = new SyntaxTreeNode("Type");
-				funcStatementTree.addChildNode(returnType, root);
+			if (ParserUtils.isInnerDataType(getTokenValue(index))) {
+				SyntaxTreeNode typeRoot = new SyntaxTreeNode("Type");
+				funcStatementTree.addChildNode(typeRoot, root);
 				
 				HashMap<String, String> extraInfo = new HashMap<>();
 				extraInfo.put("type", getTokenValue(index));
@@ -126,13 +103,13 @@ public class Parser {
 								"FIELD_TYPE", 
 								extraInfo,
 								getTokenLabel(index)), 
-						null);
+						typeRoot);
 				index++;
 				
 			// 如果是函数名
 			} else if (getTokenType(index).equals("IDENTIFIER")) {
-				SyntaxTreeNode funcName = new SyntaxTreeNode("FunctionName");
-				funcStatementTree.addChildNode(funcName, root);
+				SyntaxTreeNode funcNameRoot = new SyntaxTreeNode("FunctionName");
+				funcStatementTree.addChildNode(funcNameRoot, root);
 
 				HashMap<String, String> extraInfo = new HashMap<>();
 				extraInfo.put("type", "FUNCTION_NAME");
@@ -142,7 +119,7 @@ public class Parser {
 								"IDENTIFIER", 
 								extraInfo,
 								getTokenLabel(index)), 
-						null);
+						funcNameRoot);
 				index++;
 				
 			// 如果是参数序列
@@ -153,7 +130,7 @@ public class Parser {
 				index++;
 				while (!getTokenType(index).equals("RL_BRACKET")) {
 					
-					if (isInnerDataType(getTokenValue(index))) {
+					if (ParserUtils.isInnerDataType(getTokenValue(index))) {
 						SyntaxTreeNode param = new SyntaxTreeNode("Parameter");
 						funcStatementTree.addChildNode(param, paramsList);
 						
@@ -195,6 +172,7 @@ public class Parser {
 				
 			// 如果是遇见了左大括号
 			} else if (getTokenType(index).equals("LB_BRACKET")) {
+				// 跳过左大括号
 				index++;
 				_block(funcStatementTree);
 				
@@ -212,7 +190,6 @@ public class Parser {
 	
 	// 处理大括号里的部分
 	private void _block(SyntaxTree fatherTree) {
-		
 		SyntaxTree sentenceTree = new SyntaxTree();
 		SyntaxTreeNode root = new SyntaxTreeNode("Sentence");
 		sentenceTree.setRoot(root);
@@ -283,7 +260,7 @@ public class Parser {
 		while (index < tokens.size() && !getTokenType(index).equals("SEMICOLON")) {
 			
 			// 变量类型
-			if (isInnerDataType(getTokenValue(index))) {
+			if (ParserUtils.isInnerDataType(getTokenValue(index))) {
 				tmpVariableType = getTokenValue(index);
 				SyntaxTreeNode variableType = new SyntaxTreeNode("Type");
 				statementTree.addChildNode(variableType, root);
@@ -296,7 +273,7 @@ public class Parser {
 								"FIELD_TYPE", 
 								extraInfo,
 								getTokenLabel(index)), 
-						null);
+						variableType);
 				
 			// 变量名
 			} else if (getTokenType(index).equals("IDENTIFIER")) {
@@ -309,7 +286,7 @@ public class Parser {
 								"IDENTIFIER", 
 								extraInfo,
 								getTokenLabel(index)), 
-						statementTree.getRoot());
+						root);
 			
 			// 数组大小	
 			} else if (getTokenType(index).equals("DIGIT_CONSTANT")) {
@@ -318,11 +295,11 @@ public class Parser {
 				extraInfo.put("list_type", tmpVariableType);
 				statementTree.addChildNode(
 						new SyntaxTreeNode(
-								tokens.get(index).getValue(), 
+								getTokenValue(index), 
 								"DIGIT_CONSTANT",
 								extraInfo,
-								null), 
-						statementTree.getRoot());				
+								getTokenLabel(index)), 
+						root);
 			
 			// 数组元素
 			} else if (getTokenType(index).equals("LB_BRACKET")) {
@@ -339,6 +316,7 @@ public class Parser {
 										null,
 										getTokenLabel(index)), 
 								constantList);
+						
 					} else {
 						try {
 							throw new Exception("Error in array declare! : " + getTokenLabel(index));
@@ -470,6 +448,7 @@ public class Parser {
 			index++;
 			// 为左大括号，while的主体
 			if (getTokenType(index).equals("LB_BRACKET")) {
+				index++;
 				_block(whileTree);
 				
 			} else {
@@ -496,7 +475,7 @@ public class Parser {
 	private void _doWhile(SyntaxTreeNode father) {
 		
 		SyntaxTree doWhileTree = new SyntaxTree();
-		SyntaxTreeNode root = new SyntaxTreeNode("Control", "doWhileControl", null, null);
+		SyntaxTreeNode root = new SyntaxTreeNode("Control", "DoWhileControl", null, null);
 		doWhileTree.setRoot(root);
 		doWhileTree.setCurrent(root);
 		tree.addChildNode(root, father);
@@ -504,8 +483,9 @@ public class Parser {
 		index++;
 		// do后面必须为 {
 		if (getTokenType(index).equals("LB_BRACKET")) {
-			_block(doWhileTree);
 			index++;
+			_block(doWhileTree);
+			
 			// {..}后必须为while
 			if (getTokenType(index).equals("WHILE")) {
 				index++;
@@ -577,6 +557,7 @@ public class Parser {
 				}
 				_expression(ifRoot, tmpIndex);
 				index++;
+				
 			} else {
 				try {
 					throw new Exception("error : lack of left less bracket!");
@@ -588,7 +569,9 @@ public class Parser {
 			
 			// 处理大括号中的
 			if(getTokenType(index).equals("LB_BRACKET")) {
+				index++;
 				_block(ifTree);
+				
 			} else {
 				try {
 					throw new Exception("if statement must be surrounded by '{}'");
@@ -620,6 +603,7 @@ public class Parser {
 			
 			// 左大括号
 			 if(getTokenType(index).equals("LB_BRACKET")) {
+				 index++;
 				 _block(elseTree);
 				 
 			 } else {
@@ -678,6 +662,8 @@ public class Parser {
 			
 			// 处理for的大括号的部分，如果为左大括号
 			if (getTokenType(index).equals("LB_BRACKET")) {
+				// 跳过左大括号
+				index++;
 				_block(forTree);
 				
 			} else {
@@ -789,14 +775,14 @@ public class Parser {
 				tmpTree.setRoot(constantRoot);
 				tmpTree.setCurrent(constantRoot);
 				
-				SyntaxTreeNode node = new SyntaxTreeNode(getTokenValue(index), "_Constant", null, null);
+				SyntaxTreeNode node = new SyntaxTreeNode(getTokenValue(index), "_Constant", null, getTokenLabel(index));
 				tmpTree.addChildNode(node, null);
 				reversePolishExpression.add(tmpTree);
 				
 			// 如果是变量或者数组的某元素
 			} else if (getTokenType(index).equals("IDENTIFIER")) {
 				// 变量
-				if (isOperator(getTokenValue(index + 1))
+				if (ParserUtils.isOperator(getTokenValue(index + 1))
 						|| getTokenType(index + 1).equals("SEMICOLON")
 						|| getTokenType(index + 1).equals("RL_BRACKET")) {
 					SyntaxTree tmpTree = new SyntaxTree();
@@ -804,7 +790,7 @@ public class Parser {
 					tmpTree.setRoot(variableRoot);
 					tmpTree.setCurrent(variableRoot);
 					
-					SyntaxTreeNode node = new SyntaxTreeNode(getTokenValue(index), "_Variable", null, null);
+					SyntaxTreeNode node = new SyntaxTreeNode(getTokenValue(index), "_Variable", null, getTokenLabel(index));
 					tmpTree.addChildNode(node, null);
 					reversePolishExpression.add(tmpTree);
 					
@@ -816,13 +802,13 @@ public class Parser {
 					tmpTree.setCurrent(arrayItemRoot);
 					
 					// 数组的名字
-					SyntaxTreeNode node = new SyntaxTreeNode(getTokenValue(index), "_ArrayName", null, null);
+					SyntaxTreeNode node = new SyntaxTreeNode(getTokenValue(index), "_ArrayName", null, getTokenLabel(index));
 					tmpTree.addChildNode(node, null);
 					
 					index += 2;
 					if (getTokenType(index).equals("DIGIT_CONSTANT")
 							|| getTokenType(index).equals("IDENTIFIER")) {
-						node = new SyntaxTreeNode(getTokenValue(index), "_ArrayIndex", null, null);
+						node = new SyntaxTreeNode(getTokenValue(index), "_ArrayIndex", null, getTokenLabel(index));
 						tmpTree.addChildNode(node, null);
 						reversePolishExpression.add(tmpTree);
 						
@@ -846,12 +832,70 @@ public class Parser {
 				}
 			
 			// 如果是运算符
-			} else if () {
+			} else if (ParserUtils.isOperator(getTokenValue(index))
+					|| getTokenType(index).equals("LL_BRACKET")
+					|| getTokenType(index).equals("RL_BRACKET")) {
+				SyntaxTree tmpTree = new SyntaxTree();
+				SyntaxTreeNode root = new SyntaxTreeNode("Operator", "Operator", null, null);
+				tmpTree.setRoot(root);
+				tmpTree.setCurrent(root);
+				
+				SyntaxTreeNode node = new SyntaxTreeNode(getTokenValue(index), "_Operator", null, getTokenLabel(index));
+				tmpTree.addChildNode(node, null);
+				
+				// 如果是左括号，直接压栈
+				if (getTokenType(index).equals("LL_BRACKET")) {
+					operatorStack.push(tmpTree);
+					
+				// 如果是右括号，弹栈直到遇到左括号为止
+				} else if (getTokenType(index).equals("RL_BRACKET")) {
+					while (!operatorStack.empty() && !operatorStack.peek().getCurrent().getValue().equals("(")) {
+						reversePolishExpression.add(operatorStack.pop());
+					}
+					
+					// 将左括号弹出来
+					if (!operatorStack.empty()) {
+						operatorStack.pop();
+					}
+					
+				// 只能是其它运算符
+				} else {
+					while (!operatorStack.empty()
+							&& !operatorStack.peek().getCurrent().getValue().equals("(")
+							&& ParserDefine.OPERATOR_PRIORITY.get(tmpTree.getCurrent().getValue())
+								< ParserDefine.OPERATOR_PRIORITY.get(operatorStack.peek().getCurrent().getValue())) {
+						reversePolishExpression.add(operatorStack.pop());
+						
+					}
+					operatorStack.add(tmpTree);
+				}
+			} else {
+				try {
+					throw new Exception("Unsupport character in the expression! : " + getTokenValue(index));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				
 			}
 			
+			index++;
+		}
+		
+		// 最后将符号栈清空，最终得到逆波兰表达式reverse_polish_expression
+		while (!operatorStack.empty()) {
+			reversePolishExpression.add(operatorStack.pop());
 			
 		}
+		
+		// 把逆波兰表达式存入语法树
+		SyntaxTree newTree = new SyntaxTree();
+		SyntaxTreeNode newRoot = new SyntaxTreeNode("Expression", "SingleOrDoubleOperand", null, null);
+		newTree.setRoot(newRoot);
+		newTree.setCurrent(newRoot);
+		for (SyntaxTree item : reversePolishExpression) {
+			newTree.addChildNode(item.getRoot(), newRoot);
+		}
+		tree.addChildNode(newTree.getRoot(), father);
 		
 	}
 	
@@ -937,18 +981,18 @@ public class Parser {
 	private String judgeSentencePattern() {
 		
 		String tokenValue = getTokenValue(index);
-		String tokenType = getTokenValue(index);
+		String tokenType = getTokenType(index);
 		
 		// include句型
 		if (tokenType.equals("SHARP") && getTokenType(index + 1).equals("INCLUDE")) {
 			return "INCLUDE";
 			
 		// 控制句型
-		} else if (isControl(tokenValue)) {
+		} else if (ParserUtils.isControl(tokenValue)) {
 			return "CONTROL";
 			
 		// 可能是声明语句或函数声明语句
-		} else if (isInnerDataType(tokenValue) && getTokenType(index + 1).equals("IDENTIFIER")) {
+		} else if (ParserUtils.isInnerDataType(tokenValue) && getTokenType(index + 1).equals("IDENTIFIER")) {
 			String index2TokenType = getTokenType(index + 2);
 			
 			if(index2TokenType.equals("LL_BRACKET")) {
@@ -986,7 +1030,7 @@ public class Parser {
 		
 		// 其它的为错误
 		} else {
-			return "ERROR : " + tokenType;
+			return "ERROR : (" + getTokenType(index) + ", " + getTokenValue(index) + ", " + getTokenLabel(index) + ")";
 		}
 		
 	}	
@@ -1020,13 +1064,62 @@ public class Parser {
 				
 			} else {
 				try {
-					throw new Exception("Error token!");
+					throw new Exception("Error token! ： \'" + sentencePattern + "\'");
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.exit(1);
 				}
 			}
 		}
+		
+	}
+	
+	// 递归输出语法树
+	private void display(SyntaxTreeNode node, BufferedWriter writer) {
+		if(null == node) return;
+		
+		System.out.printf("( self: %s %s %s, father: %s, left: %s, right: %s )\n", 
+				node.getValue(), node.getType(), node.getLabel(),
+				node.getFather() == null ? null : node.getFather().getValue(), 
+				node.getLeft() == null ? null : node.getLeft().getValue(), 
+				node.getRight() == null ? null : node.getRight().getValue());
+		try {
+			writer.write("( self: " + node.getValue() + " " + node.getType() + " " + node.getLabel()
+								+ ", father: " + (node.getFather() == null ? null : node.getFather().getValue())
+								+ ", left: " + (node.getLeft() == null ? null : node.getLeft().getValue())
+								+ ", right: " + (node.getRight() == null ? null : node.getRight().getValue())
+								+ " )");
+			writer.newLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		SyntaxTreeNode child = node.getFirstSon();
+		while(child != null) {
+			display(child, writer);
+			child = child.getRight();
+		}
+	}
+	
+	public void outputParser() {
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter(CommonsDefine.OUTPUT_PATH + "parser.txt"));
+			System.out.println("====================Parser==================");
+			display(tree.getRoot(), writer);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 		
 	}
 
@@ -1038,6 +1131,7 @@ public class Parser {
 		
 		Parser parser = new Parser(lexer.getTokens());
 		parser.runParser();
+		parser.outputParser();
 		
 	}
 	

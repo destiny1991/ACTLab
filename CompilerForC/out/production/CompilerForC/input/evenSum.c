@@ -13,7 +13,7 @@ int main() {
         if(tmp == 0) {
             sum = sum + i;
         } else {
-        	sum = sum + 0;
+        	sum = sum - i * 2;
         }
     }
     printf("sum is %d", sum);

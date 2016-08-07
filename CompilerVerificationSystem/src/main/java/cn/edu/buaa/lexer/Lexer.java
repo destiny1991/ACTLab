@@ -13,14 +13,13 @@ import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cn.edu.buaa.constant.LexerDefine;
+import cn.edu.buaa.constant.CommonsDefine;
 import cn.edu.buaa.pojo.Token;
 
 public class Lexer {
 	
 	private static final Logger logger = LoggerFactory.getLogger(Lexer.class);
 	private static final String INPUT_PATH = "src/main/resources/input/";
-	private static final String OUTPUT_PATH = "src/main/resources/output/";
 	
 	private List<String> src;
 	private List<Token> tokens;
@@ -90,26 +89,26 @@ public class Lexer {
 		int i = 0;
 		Token token = null;
 		while (i < line.length()) {
-			i = skipBlank(i, line);
+			i = LexerUtils.skipBlank(i, line);
 
 			// 如果是引入头文件
 			if (i == 0 && line.charAt(i) == '#') {
 				token = new Token(4, line.charAt(i), label);
 				tokens.add(token);
 
-				i = skipBlank(i + 1, line);
+				i = LexerUtils.skipBlank(i + 1, line);
 				// 匹配和处理"include"
 				if ((i + 7) <= line.length() && line.substring(i, i + 7).equals("include")) {
 					token = new Token(0, "include", label);
 					tokens.add(token);
 
-					i = skipBlank(i + 7, line);
+					i = LexerUtils.skipBlank(i + 7, line);
 					if (line.charAt(i) == '\"' || line.charAt(i) == '<') {
 						token = new Token(4, line.charAt(i), label);
 						tokens.add(token);
 
 						char close_flag = line.charAt(i) == '\"' ? '\"' : '>';
-						i = skipBlank(i + 1, line);
+						i = LexerUtils.skipBlank(i + 1, line);
 
 						// 找到include的头文件
 						String lib = "";
@@ -123,7 +122,8 @@ public class Lexer {
 						token = new Token(4, close_flag, label);
 						tokens.add(token);
 
-						i = skipBlank(i + 1, line);
+						i = LexerUtils.skipBlank(i + 1, line);
+						
 					} else {
 						try {
 							int tmp = line.length() - i;
@@ -155,7 +155,7 @@ public class Lexer {
 				}
 
 				// 关键字
-				if (isKeyword(word)) {
+				if (LexerUtils.isKeyword(word)) {
 					token = new Token(0, word, label);
 					tokens.add(token);
 					// 标识符
@@ -163,7 +163,7 @@ public class Lexer {
 					token = new Token(1, word, label);
 					tokens.add(token);
 				}
-				i = skipBlank(i, line);
+				i = LexerUtils.skipBlank(i, line);
 
 				// 如果是数字开头
 			} else if (Character.isDigit(line.charAt(i))) {
@@ -193,10 +193,10 @@ public class Lexer {
 				// 常量
 				token = new Token(2, word, label);
 				tokens.add(token);
-				i = skipBlank(i, line);
+				i = LexerUtils.skipBlank(i, line);
 
 				// 如果是分隔符
-			} else if (isDelimiter(line.charAt(i))) {
+			} else if (LexerUtils.isDelimiter(line.charAt(i))) {
 				token = new Token(4, line.charAt(i), label);
 				tokens.add(token);
 
@@ -222,29 +222,29 @@ public class Lexer {
 						tokens.add(token);
 					}
 				}
-				i = skipBlank(i + 1, line);
+				i = LexerUtils.skipBlank(i + 1, line);
 
 				// 如果是运算符
-			} else if (isOperator(line.charAt(i))) {
+			} else if (LexerUtils.isOperator(line.charAt(i))) {
 
 				// 如果是++或者--
 				if ((line.charAt(i) == '+' || line.charAt(i) == '-') && i + 1 < line.length()
 						&& line.charAt(i) == line.charAt(i + 1)) {
 					token = new Token(3, line.substring(i, i + 2), label);
 					tokens.add(token);
-					i = skipBlank(i + 2, line);
+					i = LexerUtils.skipBlank(i + 2, line);
 
 					// 如果是>=或者<=
 				} else if ((line.charAt(i) == '>' || line.charAt(i) == '<' || line.charAt(i) == '=')
 						&& line.charAt(i + 1) == '=') {
 					token = new Token(3, line.substring(i, i + 2), label);
 					tokens.add(token);
-					i = skipBlank(i + 2, line);
+					i = LexerUtils.skipBlank(i + 2, line);
 
 				} else {
 					token = new Token(3, line.charAt(i), label);
 					tokens.add(token);
-					i = skipBlank(i + 1, line);
+					i = LexerUtils.skipBlank(i + 1, line);
 				}
 
 			} else {
@@ -259,59 +259,6 @@ public class Lexer {
 
 	}
 
-	private int skipBlank(int i, String line) {
-
-		while (i < line.length() && isBlank(i, line)) {
-			i++;
-		}
-
-		return i;
-	}
-
-	private boolean isBlank(int i, String line) {
-		char ch = line.charAt(i);
-		return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
-	}
-
-	// 判断是否是分隔符
-	private boolean isDelimiter(String word) {
-		for (String str : LexerDefine.delimiters) {
-			if (str.equals(word)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean isDelimiter(char ch) {
-		return isDelimiter(ch + "");
-	}
-
-	// 判断是否是运算符
-	private boolean isOperator(String word) {
-		for (String str : LexerDefine.operators) {
-			if (str.equals(word)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean isOperator(char ch) {
-		return isOperator(ch + "");
-	}
-
-	// 判断是否是关键字
-	private boolean isKeyword(String word) {
-		for (int i = 0; i < LexerDefine.keywords.length; i++) {
-			for (int j = 0; j < LexerDefine.keywords[i].length; j++) {
-				if (word.equals(LexerDefine.keywords[i][j])) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 
 	private List<String> getContent(String fileName) {
 		BufferedReader reader = null;
@@ -431,24 +378,14 @@ public class Lexer {
 		return codes;
 	}
 
-	private String lTrim(String str) {
 
-		int i = str.length() - 1;
-		while (i >= 0) {
-			if (str.charAt(i) != ' ' || str.charAt(i) != '\t' || str.charAt(i) != '\n') {
-				break;
-			}
-		}
-
-		return str.substring(0, i + 1);
-	}
 
 	public void labelSrc(String fileName) {
 
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(
-					new FileWriter(OUTPUT_PATH + "/label_" + fileName));
+					new FileWriter(CommonsDefine.OUTPUT_PATH + "/label_" + fileName));
 
 			int len = 50;
 			Stack<Integer> stack = new Stack<>();
@@ -465,7 +402,7 @@ public class Lexer {
 
 				if (line.trim().length() != 0) {
 					String v = generateLabel(stack);
-					line = lTrim(line);
+					line = LexerUtils.RTrim(line);
 					for (int j = line.length(); j < len; j++) {
 						line += " ";
 					}
@@ -517,7 +454,7 @@ public class Lexer {
 		BufferedWriter writer = null;
 
 		try {
-			writer = new BufferedWriter(new FileWriter(OUTPUT_PATH + "lexer.txt"));
+			writer = new BufferedWriter(new FileWriter(CommonsDefine.OUTPUT_PATH + "lexer.txt"));
 			System.out.println("====================Lexer==================");
 			for (Token e : tokens) {
 				writer.write("(" + e.getValue() + ", " + e.getType() + ", " + e.getLabel() + ")");

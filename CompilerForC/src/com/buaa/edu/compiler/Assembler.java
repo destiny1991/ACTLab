@@ -1334,7 +1334,7 @@ public class Assembler {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		String src = "src/input/sum_for.c";
+		String src = "src/input/evenSum.c";
 		String filename = src.substring(src.lastIndexOf("/") + 1);
 		Lexer lexer = new Lexer(Lexer.getContent(src));
 		lexer.runLexer();
