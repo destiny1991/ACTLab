@@ -77,7 +77,7 @@ public class Parser {
 		
 	}
 	
-	// 函数声明
+	// 函数定义
 	private void _functionStatement(SyntaxTreeNode father) {
 		if (father == null) {
 			father = tree.getRoot();
@@ -129,7 +129,6 @@ public class Parser {
 				
 				index++;
 				while (!getTokenType(index).equals("RL_BRACKET")) {
-					
 					if (ParserUtils.isInnerDataType(getTokenValue(index))) {
 						SyntaxTreeNode param = new SyntaxTreeNode("Parameter");
 						funcStatementTree.addChildNode(param, paramsList);
@@ -183,6 +182,7 @@ public class Parser {
 					e.printStackTrace();
 					System.exit(1);
 				}
+				
 			}
 		}
 		
@@ -239,11 +239,7 @@ public class Parser {
 		
 	}
 
-	/**
-	 * 需要修理
-	 * @param father
-	 */
-	// 声明语句, 变量声明、数组声明
+	// 声明语句(变量声明、数组声明)
 	private void _statement(SyntaxTreeNode father) {
 		if (father == null) {
 			father = tree.getRoot();
@@ -446,6 +442,7 @@ public class Parser {
 			}
 			_expression(root, tmpIndex);
 			index++;
+			
 			// 为左大括号，while的主体
 			if (getTokenType(index).equals("LB_BRACKET")) {
 				index++;
@@ -1050,7 +1047,7 @@ public class Parser {
 			if(sentencePattern.equals("INCLUDE")) {
 				_include(root);
 				
-			// 函数声明语句
+			// 函数定义语句
 			} else if(sentencePattern.equals("FUNCTION_STATEMENT")) {
 				_functionStatement(root);
 				
