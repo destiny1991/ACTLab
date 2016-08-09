@@ -34,8 +34,8 @@
       <file leaf-file-name="Assembler.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/buaa/edu/compiler/Assembler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="201">
-              <caret line="769" column="42" selection-start-line="769" selection-start-column="42" selection-end-line="769" selection-end-column="42" />
+            <state relative-caret-position="1026">
+              <caret line="1039" column="44" selection-start-line="1039" selection-start-column="44" selection-end-line="1039" selection-end-column="44" />
               <folding />
             </state>
           </provider>
@@ -108,8 +108,8 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
-    <option name="y" value="23" />
+    <option name="x" value="39" />
+    <option name="y" value="191" />
     <option name="width" value="1190" />
     <option name="height" value="687" />
   </component>
@@ -785,15 +785,15 @@
       <workItem from="1469261269055" duration="4668000" />
       <workItem from="1469344671561" duration="10993000" />
       <workItem from="1469862428687" duration="10474000" />
-      <workItem from="1470534231837" duration="28249000" />
+      <workItem from="1470534231837" duration="30746000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="69280000" />
+    <option name="totallyTimeSpent" value="71777000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="23" width="1190" height="687" extended-state="0" />
+    <frame x="39" y="191" width="1190" height="687" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1270,8 +1270,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/buaa/edu/compiler/Assembler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="769" column="42" selection-start-line="769" selection-start-column="42" selection-end-line="769" selection-end-column="42" />
+        <state relative-caret-position="1026">
+          <caret line="1039" column="44" selection-start-line="1039" selection-start-column="44" selection-end-line="1039" selection-end-column="44" />
           <folding />
         </state>
       </provider>
