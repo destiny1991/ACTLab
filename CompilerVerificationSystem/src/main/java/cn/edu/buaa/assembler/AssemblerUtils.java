@@ -8,7 +8,7 @@ public class AssemblerUtils {
 	public static boolean isSentenceType(String type) {
 		for (String str : AssemblerDefine.SENTENCE_TYPES) {
 			if (type.equals(str)) {
-				return false;
+				return true;
 			}
 		}
 		

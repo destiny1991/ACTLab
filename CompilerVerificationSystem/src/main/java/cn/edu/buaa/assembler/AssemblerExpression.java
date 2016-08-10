@@ -147,23 +147,16 @@ public class AssemblerExpression {
 			item.put("operand0", node.getValue());
 			item.put("operand1", node.getRight().getValue());
 			optAndOpdStack.push(item);
-			
-			return;
+		
+		// 为非叶子节点，故需要递归遍历
 		} else {
-			try {
-				throw new Exception("Invalid type in Expression : " + node.getType());
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(1);
+			SyntaxTreeNode currentNode = node.getFirstSon();
+			while(currentNode != null) {
+				traverseExpression(currentNode);
+				currentNode = currentNode.getRight();
 			}
 			
-		}
-		
-		SyntaxTreeNode currentNode = node.getFirstSon();
-		while(currentNode != null) {
-			traverseExpression(currentNode);
-			currentNode = currentNode.getRight();
-		}
+		} 
 		
 	}
 	
@@ -620,7 +613,7 @@ public class AssemblerExpression {
 					
 				} else {
 					try {
-						throw new Exception(">= not support type : " + operand_a.get("type"));
+						throw new Exception("> not support type : " + operand_a.get("type"));
 					} catch (Exception e) {
 						e.printStackTrace();
 						System.exit(1);
@@ -678,28 +671,267 @@ public class AssemblerExpression {
 				
 			}
 			
-		// 
-		} else if () {
+		// <=符号
+		} else if (operator.equals("<=")) {
+			if(containFloat) {
+				logger.debug("float <=");
+				
+			} else {
+				if(operand_a.get("type").equals("VARIABLE")) {						
+					line = "	lwz 0," + getVariableSymbolOrNumber(operand_a.get("operand"))  + "(31)";
+					assFileHandler.insert(line, "TEXT");							
+					
+				} else if(operand_a.get("type").equals("CONSTANT")) {
+					line = "	li 0," + operand_a.get("operand");
+					assFileHandler.insert(line, "TEXT");
+					
+				} else {
+					try {
+						throw new Exception("<= not support type : " + operand_a.get("type"));
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.exit(1);
+					}
+					
+				}
+				
+				if(operand_b.get("type").equals("VARIABLE")) {
+					line = "	lwz 9," + getVariableSymbolOrNumber(operand_b.get("operand")) + "(31)";
+					assFileHandler.insert(line, "TEXT");
+					
+				} else if(operand_b.get("type").equals("CONSTANT")) {
+					line = "	li 9," + operand_b.get("operand");
+					assFileHandler.insert(line, "TEXT");
+					
+				} else {
+					try {
+						throw new Exception("> not support type : " + operand_b.get("type"));
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.exit(1);
+					}
+					
+				}
+				
+				// 执行比较操作
+				line = "	cmp 7,0,0,9";
+				assFileHandler.insert(line, "TEXT");
+				line = "	li 0,1";
+				assFileHandler.insert(line, "TEXT");
+				line = "	isel 0,0,0,29";
+				assFileHandler.insert(line, "TEXT");
+				
+				// 赋值给临时操作数
+				String bss_tmp = "bss_tmp" + bss_tmp_cnt;
+				bss_tmp_cnt++;
+				// 记录到符号表中
+				Map<String, String> tmpMap = new HashMap<>();
+				tmpMap.put("type", "IDENTIFIER");
+				tmpMap.put("field_type", "int");
+				tmpMap.put("register", Integer.toString(memAdress));
+				memAdress += 4;
+				symbolTable.put(bss_tmp, tmpMap);
+				
+				line = "	stw 0," + getVariableSymbolOrNumber(bss_tmp) + "(31)";
+				assFileHandler.insert(line, "TEXT");
+				// 计算结果压栈
+				tmpMap = new HashMap<>();
+				tmpMap.put("type", "VARIABLE");
+				tmpMap.put("operand", bss_tmp);
+				operandStack.push(tmpMap);
+				
+			}
 			
-		} else if () {
+		// < 符号
+		} else if (operator.equals("<")) {
+			if(containFloat) {
+				logger.debug("float <");
+				
+			} else {
+				if(operand_a.get("type").equals("VARIABLE")) {						
+					line = "	lwz 0," + getVariableSymbolOrNumber(operand_a.get("operand")) + "(31)";
+					assFileHandler.insert(line, "TEXT");
+					
+				} else if(operand_a.get("type").equals("CONSTANT")) {
+					line = "	li 0," + operand_a.get("operand");
+					assFileHandler.insert(line, "TEXT");
+					
+				} else {
+					try {
+						throw new Exception("< not support type : " + operand_a.get("type"));
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.exit(1);
+					}
+					
+				}
+				
+				if(operand_b.get("type").equals("VARIABLE")) {
+					line = "	lwz 9," + getVariableSymbolOrNumber(operand_b.get("operand")) + "(31)";
+					assFileHandler.insert(line, "TEXT");
+					
+				} else if(operand_b.get("type").equals("CONSTANT")) {
+					line = "	li 9," + operand_b.get("operand");
+					assFileHandler.insert(line, "TEXT");
+					
+				} else {
+					try {
+						throw new Exception("< not support type : " + operand_b.get("type"));
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.exit(1);
+					}
+					
+				}
+				
+				// 比较操作
+				line = "	cmp 7,0,0,9";
+				assFileHandler.insert(line, "TEXT");
+				line = "	li 0,0";
+				assFileHandler.insert(line, "TEXT");
+				line = "	li 9,1";
+				assFileHandler.insert(line, "TEXT");
+				line = "	isel 0,9,0,28";   // 28   CR7 = CR[28, 29, 30, 31] 
+											  // (cr[crfD] : 有4位 : LT,GT,EQ,SO)
+				assFileHandler.insert(line, "TEXT");
+				
+				// 赋值给临时操作数
+				String bss_tmp = "bss_tmp" + bss_tmp_cnt;
+				bss_tmp_cnt++;
+				// 记录到符号表中
+				Map<String, String> tmpMap = new HashMap<>();
+				tmpMap.put("type", "IDENTIFIER");
+				tmpMap.put("field_type", "int");
+				tmpMap.put("register", Integer.toString(memAdress));
+				memAdress += 4;
+				symbolTable.put(bss_tmp, tmpMap);
+				
+				line = "	stw 0," + getVariableSymbolOrNumber(bss_tmp) + "(31)";
+				assFileHandler.insert(line, "TEXT");
+				// 计算结果压栈
+				tmpMap = new HashMap<>();
+				tmpMap.put("type", "VARIABLE");
+				tmpMap.put("operand", bss_tmp);
+				operandStack.push(tmpMap);
+				
+			} 
 			
-		} else if () {
+		// == 符号
+		} else if (operator.equals("==")) {
+			if(containFloat) {
+				logger.debug("float <");
+				
+			} else {
+				if(operand_a.get("type").equals("VARIABLE")) {						
+					line = "	lwz 0," + getVariableSymbolOrNumber(operand_a.get("operand")) + "(31)";
+					assFileHandler.insert(line, "TEXT");
+					
+				} else if(operand_a.get("type").equals("CONSTANT")) {
+					line = "	li 0," + operand_a.get("operand");
+					assFileHandler.insert(line, "TEXT");
+					
+				} else {
+					try {
+						throw new Exception("== not support type : " + operand_a.get("type"));
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.exit(1);
+					}
+					
+				}
+				
+				if(operand_b.get("type").equals("VARIABLE")) {
+					line = "	lwz 9," + getVariableSymbolOrNumber(operand_b.get("operand")) + "(31)";
+					assFileHandler.insert(line, "TEXT");
+					
+				} else if(operand_b.get("type").equals("CONSTANT")) {
+					line = "	li 9," + operand_b.get("operand");
+					assFileHandler.insert(line, "TEXT");
+					
+				} else {
+					try {
+						throw new Exception("== not support type : " + operand_b.get("type"));
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.exit(1);
+					}
+					
+				}
+				
+				// 比较操作
+				line = "	cmp 7,0,0,9";
+				assFileHandler.insert(line, "TEXT");
+				line = "	li 0,0";
+				assFileHandler.insert(line, "TEXT");
+				line = "	li 9,1";
+				assFileHandler.insert(line, "TEXT");
+				line = "	isel 0,9,0,30";
+				assFileHandler.insert(line, "TEXT");
+				
+				// 赋值给临时操作数
+				String bss_tmp = "bss_tmp" + bss_tmp_cnt;
+				bss_tmp_cnt++;
+				// 记录到符号表中
+				Map<String, String> tmpMap = new HashMap<>();
+				tmpMap.put("type", "IDENTIFIER");
+				tmpMap.put("field_type", "int");
+				tmpMap.put("register", Integer.toString(memAdress));
+				memAdress += 4;
+				symbolTable.put(bss_tmp, tmpMap);
+				
+				line = "	stw 0," + getVariableSymbolOrNumber(bss_tmp) + "(31)";
+				assFileHandler.insert(line, "TEXT");
+				// 计算结果压栈
+				tmpMap = new HashMap<>();
+				tmpMap.put("type", "VARIABLE");
+				tmpMap.put("operand", bss_tmp);
+				operandStack.push(tmpMap);
+				
+			}
 			
 		} else {
-			throw new Exception("other operator not support in double operator : " + operator);
+			try {
+				throw new Exception("other operator not support in double operator : " + operator);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 			
 		}
 		
-		// 添加一个空行
-		assFileHandler.insert("", "TEXT");
 	}
 	
 	// 处理单目运算
 	private static void solveSingleOperator(String operator) {
-		
-		
+		// 取出操作数
+		Map<String, String> operand = operandStack.peek();
+		String line = null;
+		if(operator.equals("++")) {
+			line = "	lwz 0," + getVariableSymbolOrNumber(operand.get("operand")) + "(31)";
+			assFileHandler.insert(line, "TEXT");
+			line = "	addic 0,0,1";
+			assFileHandler.insert(line, "TEXT");
+			line = "	stw 0," + getVariableSymbolOrNumber(operand.get("operand")) + "(31)";
+			assFileHandler.insert(line, "TEXT");
+			
+		} else if(operator.equals("--")) {
+			line = "	lwz 0," + getVariableSymbolOrNumber(operand.get("operand")) + "(31)";
+			assFileHandler.insert(line, "TEXT");
+			line = "	addic 0,0,-1";
+			assFileHandler.insert(line, "TEXT");
+			line = "	stw 0," + getVariableSymbolOrNumber(operand.get("operand")) + "(31)";
+			assFileHandler.insert(line, "TEXT");
+			
+		} else {
+			try {
+				throw new Exception("Only suport ++ and -- singleOperator : " + operator);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+			
+		}
 		
 	}
 
-	
 }
